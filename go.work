@@ -1,8 +1,8 @@
 go 1.22
 
 use (
-	cmd/auth
-	cmd/chat-server
+	services/auth
+	services/chat-server
 	pkg
 	protos
 )
