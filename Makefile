@@ -6,7 +6,17 @@ install:
 	GOBIN=$(LOCAL_BIN) go install -mod=mod google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 
 lint:
-	GOBIN=$(LOCAL_BIN) golangci-lint run ./... --config .golangci.pipeline.yaml
+	GOBIN=$(LOCAL_BIN) golangci-lint run ./pkg ./services/auth ./services/chat-server --config .golangci.pipeline.yaml
+
+test:
+	go test -v ./pkg/... ./services/auth/... ./services/chat-server/...
+
+build:
+	go build -o ./bin/auth -mod vendor -v ./services/auth/
+	go build -o ./bin/chat-server -mod vendor -v ./services/chat-server/
+
+vendor:
+	go work vendor
 
 generate:
 	make generate-user-api
