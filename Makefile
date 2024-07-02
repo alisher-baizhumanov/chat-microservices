@@ -18,6 +18,13 @@ build:
 vendor:
 	go work vendor
 
+tidy:
+	cd pkg && go mod tidy && cd .. && \
+	cd protos && go mod tidy && cd .. && \
+	cd services/auth && go mod tidy && cd ../.. && \
+	cd services/chat-server && go mod tidy && cd ../..
+
+
 generate:
 	make generate-user-api
 	make generate-chat-api
