@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1"
@@ -15,7 +16,7 @@ type userServer struct {
 }
 
 func (s *userServer) Create(ctx context.Context, createIn *desc.CreateIn) (*desc.CreateOut, error) {
-	user := createIn.GetUserRegister()
+	user := createIn.UserRegister
 
 	slog.InfoContext(ctx, "created user",
 		slog.String("name", user.Name),
@@ -38,4 +39,31 @@ func (s *userServer) Get(ctx context.Context, getIn *desc.GetIn) (*desc.GetOut, 
 		CreatedAt: timestamppb.New(gofakeit.Date()),
 		UpdatedAt: timestamppb.New(gofakeit.Date()),
 	}}, nil
+}
+
+func (s *userServer) Update(ctx context.Context, updateIn *desc.UpdateIn) (*emptypb.Empty, error) {
+	updateArgs := updateIn.UserUpdate
+
+	log := slog.With("id", updateIn.Id)
+
+	if updateArgs.Role != desc.Role_NULL {
+		log = log.With("role", updateArgs.Role)
+	}
+
+	if updateArgs.Name != nil {
+		log = log.With("name", updateArgs.Name.Value)
+	}
+
+	if updateArgs.Email != nil {
+		log = log.With("email", updateArgs.Email.Value)
+	}
+
+	log.InfoContext(ctx, "update user")
+	return nil, nil
+}
+
+func (s *userServer) Delete(ctx context.Context, deleteIn *desc.DeleteIn) (*emptypb.Empty, error) {
+	slog.InfoContext(ctx, "delete user", slog.Int64("id", deleteIn.Id))
+
+	return nil, nil
 }

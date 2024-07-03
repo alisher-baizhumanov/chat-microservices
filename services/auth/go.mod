@@ -5,6 +5,7 @@ go 1.22
 toolchain go1.22.4
 
 require (
+	github.com/alisher-baizhumanov/chat-microservices/pkg v0.0.0-20240702175335-ea826989d27d
 	github.com/alisher-baizhumanov/chat-microservices/protos v0.0.0-20240702150145-8ae71071eb9d
 	github.com/brianvoe/gofakeit/v7 v7.0.4
 	google.golang.org/grpc v1.64.0

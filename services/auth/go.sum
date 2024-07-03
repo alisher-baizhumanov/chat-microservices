@@ -1,3 +1,5 @@
+github.com/alisher-baizhumanov/chat-microservices/pkg v0.0.0-20240702175335-ea826989d27d h1:Y8SD/9u3MnOZjnfVDVEUMhGVCPwWsNqXhp4gwbTx3bM=
+github.com/alisher-baizhumanov/chat-microservices/pkg v0.0.0-20240702175335-ea826989d27d/go.mod h1:HfJEN88MKFUHJzT0OrqpnIXbS+uNgR+NV5vY23pJpyw=
 github.com/alisher-baizhumanov/chat-microservices/protos v0.0.0-20240702150145-8ae71071eb9d h1:U5KBXL6JB2njmsfg4+Za9W19Niq28lwdB7vnNw6w7jk=
 github.com/alisher-baizhumanov/chat-microservices/protos v0.0.0-20240702150145-8ae71071eb9d/go.mod h1:mpZgSy3FInh7rmENctHSekDQFEaEuXLrl8rtMRWTSLI=
 github.com/brianvoe/gofakeit/v7 v7.0.4 h1:Mkxwz9jYg8Ad8NvT9HA27pCMZGFQo08MK6jD0QTKEww=
