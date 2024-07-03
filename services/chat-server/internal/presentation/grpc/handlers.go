@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 	"log/slog"
-	"time"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -34,12 +33,10 @@ func (s *chatServer) Delete(ctx context.Context, deleteIn *desc.DeleteIn) (*empt
 func (s *chatServer) SendMessage(ctx context.Context, sendMessageIn *desc.SendMessageIn) (*emptypb.Empty, error) {
 	message := sendMessageIn.Message
 
-	timeStamp := time.Unix(message.Timestamp.Seconds, 0)
-
 	slog.InfoContext(ctx, "send message",
 		slog.String("form", message.Form),
 		slog.String("text", message.Text),
-		slog.Time("timestamp", timeStamp),
+		slog.Time("timestamp", message.Timestamp.AsTime()),
 	)
 
 	return nil, nil

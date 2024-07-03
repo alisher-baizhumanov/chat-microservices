@@ -1,0 +1,5 @@
+bin
+.github
+.idea
+.golangci.pipeline.yaml
+.gitignore

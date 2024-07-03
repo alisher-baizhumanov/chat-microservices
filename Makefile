@@ -24,8 +24,8 @@ build:
 tidy:
 	cd pkg && go mod tidy && cd .. && \
 	cd protos && go mod tidy && cd .. && \
-	cd services/auth && go mod tidy -e && cd ../.. && \
-	cd services/chat-server && go mod tidy -e && cd ../..
+	cd services/auth && go mod tidy && cd ../.. && \
+	cd services/chat-server && go mod tidy && cd ../..
 	go work sync && go work vendor
 
 generate:
