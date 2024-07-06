@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/presentation/grpc"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"
 )
 
 const port = 55051
