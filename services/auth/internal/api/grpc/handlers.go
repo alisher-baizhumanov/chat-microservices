@@ -9,13 +9,19 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service"
 )
 
-type userServer struct {
+type ServerHandlers struct {
 	desc.UnimplementedUserServiceV1Server
+	userService service.UserService
 }
 
-func (s *userServer) Create(ctx context.Context, createIn *desc.CreateIn) (*desc.CreateOut, error) {
+func NewUserGRPCHandlers(userService service.UserService) *ServerHandlers {
+	return &ServerHandlers{userService: userService}
+}
+
+func (h *ServerHandlers) Create(ctx context.Context, createIn *desc.CreateIn) (*desc.CreateOut, error) {
 	user := createIn.UserRegister
 
 	slog.InfoContext(ctx, "created user",
@@ -28,7 +34,7 @@ func (s *userServer) Create(ctx context.Context, createIn *desc.CreateIn) (*desc
 	return &desc.CreateOut{Id: gofakeit.Int64()}, nil
 }
 
-func (s *userServer) Get(ctx context.Context, getIn *desc.GetIn) (*desc.GetOut, error) {
+func (h *ServerHandlers) Get(ctx context.Context, getIn *desc.GetIn) (*desc.GetOut, error) {
 	slog.InfoContext(ctx, "get user", slog.Int64("id", getIn.Id))
 
 	return &desc.GetOut{UserInfo: &desc.UserInfo{
@@ -41,7 +47,7 @@ func (s *userServer) Get(ctx context.Context, getIn *desc.GetIn) (*desc.GetOut, 
 	}}, nil
 }
 
-func (s *userServer) Update(ctx context.Context, updateIn *desc.UpdateIn) (*emptypb.Empty, error) {
+func (h *ServerHandlers) Update(ctx context.Context, updateIn *desc.UpdateIn) (*emptypb.Empty, error) {
 	updateArgs := updateIn.UserUpdate
 
 	log := slog.With("id", updateIn.Id)
@@ -62,7 +68,7 @@ func (s *userServer) Update(ctx context.Context, updateIn *desc.UpdateIn) (*empt
 	return nil, nil
 }
 
-func (s *userServer) Delete(ctx context.Context, deleteIn *desc.DeleteIn) (*emptypb.Empty, error) {
+func (h *ServerHandlers) Delete(ctx context.Context, deleteIn *desc.DeleteIn) (*emptypb.Empty, error) {
 	slog.InfoContext(ctx, "delete user", slog.Int64("id", deleteIn.Id))
 
 	return nil, nil
