@@ -8,6 +8,10 @@ import (
 )
 
 func UserRegisterProtoToModel(user *desc.UserRegister) *model.UserRegister {
+	if user == nil {
+		return nil
+	}
+
 	return &model.UserRegister{
 		Name:            user.Name,
 		Email:           user.Email,
@@ -17,6 +21,10 @@ func UserRegisterProtoToModel(user *desc.UserRegister) *model.UserRegister {
 }
 
 func UserModelToProto(user *model.User) *desc.UserInfo {
+	if user == nil {
+		return nil
+	}
+
 	var role desc.Role
 
 	switch user.Role {
@@ -37,6 +45,10 @@ func UserModelToProto(user *model.User) *desc.UserInfo {
 }
 
 func UserOptionsProtoToModel(options *desc.UserUpdate) *model.UserUpdateOptions {
+	if options == nil {
+		return nil
+	}
+
 	var (
 		role  model.Role
 		name  *string
