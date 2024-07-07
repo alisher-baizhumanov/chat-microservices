@@ -23,3 +23,11 @@ type UserUpdateOptions struct {
 	Name  *string
 	Email *string
 }
+
+type UserCreate struct {
+	Name           string
+	Email          string
+	Role           Role
+	HashedPassword []byte
+	CreatedAt      time.Time
+}
