@@ -15,9 +15,10 @@ type chatServer struct {
 }
 
 func (s *chatServer) Create(ctx context.Context, createIn *desc.CreateIn) (*desc.CreateOut, error) {
-	usernames := createIn.Usernames
-
-	slog.InfoContext(ctx, "created chat", slog.Any("usernames", usernames))
+	slog.InfoContext(ctx, "created chat",
+		slog.Any("usernames", createIn.UserIdList),
+		slog.String("name", createIn.Name),
+	)
 
 	return &desc.CreateOut{Id: gofakeit.Int64()}, nil
 }
