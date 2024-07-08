@@ -7,11 +7,13 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"
 )
 
+// App represents the application with its services and gRPC server.
 type App struct {
 	services serviceProvider
 	server   *grpc.Server
 }
 
+// NewApp creates and initializes a new App instance.
 func NewApp() (*App, error) {
 	var err error
 
@@ -28,6 +30,7 @@ func NewApp() (*App, error) {
 	return app, nil
 }
 
+// Run starts the gRPC server and waits for a termination signal to gracefully shut down the server.
 func (a *App) Run() error {
 	a.server.Start()
 	defer a.server.Stop()

@@ -7,6 +7,7 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 )
 
+// UserRegisterProtoToModel converts a UserRegister protobuf message to a model.UserRegister struct.
 func UserRegisterProtoToModel(user *desc.UserRegister) *model.UserRegister {
 	if user == nil {
 		return nil
@@ -20,6 +21,7 @@ func UserRegisterProtoToModel(user *desc.UserRegister) *model.UserRegister {
 	}
 }
 
+// UserModelToProto converts a model.User struct to a UserInfo protobuf message.
 func UserModelToProto(user *model.User) *desc.UserInfo {
 	if user == nil {
 		return nil
@@ -35,7 +37,7 @@ func UserModelToProto(user *model.User) *desc.UserInfo {
 	}
 
 	return &desc.UserInfo{
-		Id:        user.Id,
+		Id:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,
 		Role:      role,
@@ -44,6 +46,7 @@ func UserModelToProto(user *model.User) *desc.UserInfo {
 	}
 }
 
+// UserOptionsProtoToModel converts a UserUpdate protobuf message to a model.UserUpdateOptions struct.
 func UserOptionsProtoToModel(options *desc.UserUpdate) *model.UserUpdateOptions {
 	if options == nil {
 		return nil

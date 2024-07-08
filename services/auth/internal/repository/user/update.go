@@ -7,6 +7,7 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 )
 
+// UpdateUser updates a user's information in the repository based on the provided user ID and update options.
 func (r *Repository) UpdateUser(ctx context.Context, id int64, options *model.UserUpdateOptions) (err error) {
 	log := slog.With("id", id)
 

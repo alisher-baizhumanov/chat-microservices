@@ -2,8 +2,9 @@ package model
 
 import "time"
 
+// User represents a user info in the system with basic details and timestamps.
 type User struct {
-	Id        int64
+	ID        int64
 	Name      string
 	Email     string
 	Role      Role
@@ -11,6 +12,7 @@ type User struct {
 	UpdatedAt time.Time
 }
 
+// UserRegister represents the data required to register a new user.
 type UserRegister struct {
 	Name            string
 	Email           string
@@ -18,12 +20,14 @@ type UserRegister struct {
 	PasswordConfirm []byte
 }
 
+// UserUpdateOptions represents the options available for updating a user's details.
 type UserUpdateOptions struct {
 	Role  *Role
 	Name  *string
 	Email *string
 }
 
+// UserCreate represents the data required to create a new user.
 type UserCreate struct {
 	Name           string
 	Email          string

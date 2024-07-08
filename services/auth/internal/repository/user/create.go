@@ -9,6 +9,7 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 )
 
+// CreateUser creates a new user in the repository with the provided user creation data.
 func (r *Repository) CreateUser(ctx context.Context, user *model.UserCreate) (id int64, err error) {
 	slog.InfoContext(ctx, "created user",
 		slog.String("name", user.Name),

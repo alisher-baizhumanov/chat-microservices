@@ -10,15 +10,18 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service"
 )
 
+// ServerHandlers implements the gRPC server for user-related operations.
 type ServerHandlers struct {
 	desc.UnimplementedUserServiceV1Server
 	userService service.UserService
 }
 
+// NewUserGRPCHandlers creates and returns a new ServerHandlers instance.
 func NewUserGRPCHandlers(userService service.UserService) *ServerHandlers {
 	return &ServerHandlers{userService: userService}
 }
 
+// Create registers a new user based on the provided CreateIn message.
 func (h *ServerHandlers) Create(ctx context.Context, createIn *desc.CreateIn) (*desc.CreateOut, error) {
 	id, err := h.userService.RegisterUser(
 		ctx,
@@ -32,8 +35,9 @@ func (h *ServerHandlers) Create(ctx context.Context, createIn *desc.CreateIn) (*
 	return &desc.CreateOut{Id: id}, nil
 }
 
+// Get retrieves a user's information based on the provided GetIn message.
 func (h *ServerHandlers) Get(ctx context.Context, getIn *desc.GetIn) (*desc.GetOut, error) {
-	user, err := h.userService.GetById(ctx, getIn.Id)
+	user, err := h.userService.GetByID(ctx, getIn.Id)
 
 	if err != nil {
 		return nil, err
@@ -44,6 +48,7 @@ func (h *ServerHandlers) Get(ctx context.Context, getIn *desc.GetIn) (*desc.GetO
 		nil
 }
 
+// Update modifies a user's information based on the provided UpdateIn message.
 func (h *ServerHandlers) Update(ctx context.Context, updateIn *desc.UpdateIn) (*emptypb.Empty, error) {
 	err := h.userService.UpdateUserFields(
 		ctx,
@@ -58,8 +63,9 @@ func (h *ServerHandlers) Update(ctx context.Context, updateIn *desc.UpdateIn) (*
 	return nil, nil
 }
 
+// Delete removes a user based on the provided DeleteIn message.
 func (h *ServerHandlers) Delete(ctx context.Context, deleteIn *desc.DeleteIn) (*emptypb.Empty, error) {
-	err := h.userService.DeleteById(ctx, deleteIn.Id)
+	err := h.userService.DeleteByID(ctx, deleteIn.Id)
 
 	if err != nil {
 		return nil, err

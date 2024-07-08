@@ -9,13 +9,14 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 )
 
+// GetUser retrieves a user from the repository based on the provided user ID.
 func (r *Repository) GetUser(ctx context.Context, id int64) (user *model.User, err error) {
 	slog.InfoContext(ctx, "get user", slog.Int64("id", id))
 
 	createdAt := gofakeit.Date()
 
 	return &model.User{
-		Id:        id,
+		ID:        id,
 		Name:      gofakeit.Name(),
 		Email:     gofakeit.Email(),
 		Role:      model.UserRole,
