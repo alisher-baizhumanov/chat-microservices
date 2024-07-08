@@ -47,3 +47,9 @@ generate-chat-api:
     	--plugin=protoc-gen-go=bin/protoc-gen-go \
     	--go-grpc_out=protos/generated/chat-v1 --go-grpc_opt=paths=source_relative \
     	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc api/proto/chat-v1/chat.proto
+
+up:
+	docker-compose up --build --detach
+
+down:
+	docker-compose down --remove-orphans
