@@ -16,23 +16,23 @@ type userServer struct {
 }
 
 func (s *userServer) Create(ctx context.Context, createIn *desc.CreateIn) (*desc.CreateOut, error) {
-	user := createIn.UserRegister
+	user := createIn.GetUserRegister()
 
 	slog.InfoContext(ctx, "created user",
-		slog.String("name", user.Name),
-		slog.String("email", user.Email),
-		slog.String("password", user.Password),
-		slog.String("password_confirm", user.PasswordConfirm),
+		slog.String("name", user.GetName()),
+		slog.String("email", user.GetEmail()),
+		slog.String("password", user.GetPassword()),
+		slog.String("password_confirm", user.GetPasswordConfirm()),
 	)
 
 	return &desc.CreateOut{Id: gofakeit.Int64()}, nil
 }
 
 func (s *userServer) Get(ctx context.Context, getIn *desc.GetIn) (*desc.GetOut, error) {
-	slog.InfoContext(ctx, "get user", slog.Int64("id", getIn.Id))
+	slog.InfoContext(ctx, "get user", slog.Int64("id", getIn.GetId()))
 
 	return &desc.GetOut{UserInfo: &desc.UserInfo{
-		Id:        getIn.Id,
+		Id:        getIn.GetId(),
 		Name:      gofakeit.Name(),
 		Email:     gofakeit.Email(),
 		Role:      desc.Role_USER,
@@ -42,28 +42,22 @@ func (s *userServer) Get(ctx context.Context, getIn *desc.GetIn) (*desc.GetOut, 
 }
 
 func (s *userServer) Update(ctx context.Context, updateIn *desc.UpdateIn) (*emptypb.Empty, error) {
-	updateArgs := updateIn.UserUpdate
+	updateArgs := updateIn.GetUserUpdate()
 
-	log := slog.With("id", updateIn.Id)
+	slog.InfoContext(ctx, "update user",
+		slog.With("id", updateIn.GetId()),
+		slog.With("role", updateArgs.GetRole()),
+		slog.With("name", updateArgs.GetName()),
+		slog.With("email", updateArgs.GetEmail()),
+	)
 
-	if updateArgs.Role != desc.Role_NULL {
-		log = log.With("role", updateArgs.Role)
-	}
-
-	if updateArgs.Name != nil {
-		log = log.With("name", updateArgs.Name.Value)
-	}
-
-	if updateArgs.Email != nil {
-		log = log.With("email", updateArgs.Email.Value)
-	}
-
-	log.InfoContext(ctx, "update user")
 	return nil, nil
 }
 
 func (s *userServer) Delete(ctx context.Context, deleteIn *desc.DeleteIn) (*emptypb.Empty, error) {
-	slog.InfoContext(ctx, "delete user", slog.Int64("id", deleteIn.Id))
+	slog.InfoContext(ctx, "delete user",
+		slog.Int64("id", deleteIn.GetId()),
+	)
 
 	return nil, nil
 }
