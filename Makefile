@@ -34,16 +34,16 @@ generate:
 
 generate-user-api:
 	mkdir -p protos/generated/user-v1
-	protoc --proto_path protos/sources/user-v1 \
+	protoc --proto_path api/proto/user-v1 \
     	--go_out=protos/generated/user-v1 --go_opt=paths=source_relative \
     	--plugin=protoc-gen-go=bin/protoc-gen-go \
     	--go-grpc_out=protos/generated/user-v1 --go-grpc_opt=paths=source_relative \
-    	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc protos/sources/user-v1/user.proto
+    	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc api/proto/user-v1/user.proto
 
 generate-chat-api:
 	mkdir -p protos/generated/chat-v1
-	protoc --proto_path protos/sources/chat-v1 \
+	protoc --proto_path api/proto/chat-v1 \
     	--go_out=protos/generated/chat-v1 --go_opt=paths=source_relative \
     	--plugin=protoc-gen-go=bin/protoc-gen-go \
     	--go-grpc_out=protos/generated/chat-v1 --go-grpc_opt=paths=source_relative \
-    	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc protos/sources/chat-v1/chat.proto
+    	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc api/proto/chat-v1/chat.proto

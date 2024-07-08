@@ -14,7 +14,8 @@ service ChatServiceV1 {
 }
 
 message CreateIn {
-  repeated string usernames = 1;
+  string name = 1;
+  repeated int64 user_id_list = 2;
 }
 
 message CreateOut {
