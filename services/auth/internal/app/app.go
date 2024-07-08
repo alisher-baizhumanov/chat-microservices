@@ -4,7 +4,8 @@ import (
 	"log/slog"
 
 	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
+	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1"
 )
 
 // App represents the application with its services and gRPC server.
@@ -15,17 +16,17 @@ type App struct {
 
 // NewApp creates and initializes a new App instance.
 func NewApp() (*App, error) {
-	var err error
-
 	app := &App{}
 
 	gRPCHandlers := app.services.ServerHandlers()
 
 	cfg := app.services.Config()
-	app.server, err = grpc.NewGRPCServer(cfg.GRPCServerPort, gRPCHandlers)
+	server, err := grpc.NewGRPCServer(cfg.GRPCServerPort, &desc.UserServiceV1_ServiceDesc, gRPCHandlers)
 	if err != nil {
 		return nil, err
 	}
+
+	app.server = server
 
 	return app, nil
 }

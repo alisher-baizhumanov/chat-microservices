@@ -6,8 +6,6 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-
-	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1"
 )
 
 // Server represents the gRPC server with its listener and server instance.
@@ -19,6 +17,8 @@ type Server struct {
 // Start runs the gRPC server in a separate goroutine to handle incoming requests.
 func (s *Server) Start() {
 	go func() {
+		// We can ignore error because
+		// Serve will return a non-nil error unless Stop or GracefulStop is called.
 		_ = s.gRPCServer.Serve(s.listener)
 	}()
 }
@@ -30,7 +30,7 @@ func (s *Server) Stop() {
 
 // NewGRPCServer creates and returns a new Server instance listening on the specified port.
 // It also registers the user service and reflection service to the gRPC server.
-func NewGRPCServer(port int, serverHandlers *ServerHandlers) (*Server, error) {
+func NewGRPCServer(port int, serviceDesc *grpc.ServiceDesc, handlers any) (*Server, error) {
 	var server Server
 
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
@@ -42,7 +42,7 @@ func NewGRPCServer(port int, serverHandlers *ServerHandlers) (*Server, error) {
 
 	gRPCServer := grpc.NewServer()
 	reflection.Register(gRPCServer)
-	desc.RegisterUserServiceV1Server(gRPCServer, serverHandlers)
+	gRPCServer.RegisterService(serviceDesc, handlers)
 
 	return &Server{
 		gRPCServer: gRPCServer,
