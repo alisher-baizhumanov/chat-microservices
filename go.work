@@ -1,0 +1,8 @@
+go 1.22
+
+use (
+	pkg
+	protos
+	services/auth
+	services/chat-server
+)

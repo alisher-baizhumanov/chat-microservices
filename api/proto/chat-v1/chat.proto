@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+package chat_v1;
+
+option go_package = "github.com/alisher-baizhumanov/chat-microservices/protos/generated/chat-v1;chat_v1";
+
+service ChatServiceV1 {
+  rpc Create(CreateIn) returns (CreateOut) {}
+  rpc Delete(DeleteIn) returns (google.protobuf.Empty) {}
+  rpc SendMessage(SendMessageIn) returns (google.protobuf.Empty) {}
+}
+
+message CreateIn {
+  string name = 1;
+  repeated int64 user_id_list = 2;
+}
+
+message CreateOut {
+  int64 id = 1;
+}
+
+message DeleteIn {
+  int64 id = 1;
+}
+
+message SendMessageIn {
+  Message message = 1;
+}
+
+message Message {
+  string form = 1;
+  string text = 2;
+  google.protobuf.Timestamp timestamp = 3;
+}
