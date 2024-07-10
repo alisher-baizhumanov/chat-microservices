@@ -27,9 +27,8 @@ func (h *ServerHandlers) Create(ctx context.Context, createIn *desc.CreateIn) (*
 		ctx,
 		converter.UserRegisterProtoToModel(createIn.UserRegister),
 	)
-
 	if err != nil {
-		return nil, err
+		return nil, converter.ErrorModelToProto(err)
 	}
 
 	return &desc.CreateOut{Id: id}, nil
@@ -37,27 +36,25 @@ func (h *ServerHandlers) Create(ctx context.Context, createIn *desc.CreateIn) (*
 
 // Get retrieves a user's information based on the provided GetIn message.
 func (h *ServerHandlers) Get(ctx context.Context, getIn *desc.GetIn) (*desc.GetOut, error) {
-	user, err := h.userService.GetByID(ctx, getIn.Id)
-
+	user, err := h.userService.GetByID(ctx, getIn.GetId())
 	if err != nil {
-		return nil, err
+		return nil, converter.ErrorModelToProto(err)
 	}
 
 	return &desc.GetOut{
-			UserInfo: converter.UserModelToProto(user)},
-		nil
+		UserInfo: converter.UserModelToProto(user),
+	}, nil
 }
 
 // Update modifies a user's information based on the provided UpdateIn message.
 func (h *ServerHandlers) Update(ctx context.Context, updateIn *desc.UpdateIn) (*emptypb.Empty, error) {
 	err := h.userService.UpdateUserFields(
 		ctx,
-		updateIn.Id,
-		converter.UserOptionsProtoToModel(updateIn.UserUpdate),
+		updateIn.GetId(),
+		converter.UserOptionsProtoToModel(updateIn.GetUserUpdate()),
 	)
-
 	if err != nil {
-		return nil, err
+		return nil, converter.ErrorModelToProto(err)
 	}
 
 	return nil, nil
@@ -65,10 +62,9 @@ func (h *ServerHandlers) Update(ctx context.Context, updateIn *desc.UpdateIn) (*
 
 // Delete removes a user based on the provided DeleteIn message.
 func (h *ServerHandlers) Delete(ctx context.Context, deleteIn *desc.DeleteIn) (*emptypb.Empty, error) {
-	err := h.userService.DeleteByID(ctx, deleteIn.Id)
-
+	err := h.userService.DeleteByID(ctx, deleteIn.GetId())
 	if err != nil {
-		return nil, err
+		return nil, converter.ErrorModelToProto(err)
 	}
 
 	return nil, nil
