@@ -9,6 +9,14 @@ import (
 
 // UpdateUser updates a user's information in the repository based on the provided user ID and update options.
 func (r *Repository) UpdateUser(ctx context.Context, id int64, options *model.UserUpdateOptions) (err error) {
+	if id < 1 {
+		return model.ErrInvalidID
+	}
+
+	if options == nil {
+		return model.ErrCanNotBeNil
+	}
+
 	log := slog.With("id", id)
 
 	if options.Role != nil {
