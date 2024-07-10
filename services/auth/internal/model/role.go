@@ -5,13 +5,13 @@ type Role int8
 
 const (
 	// NullRole indicates an undefined  role.
-	NullRole Role = 0
+	NullRole Role = iota
 
 	// UserRole indicates a standard user role.
-	UserRole = 1
+	UserRole
 
 	// AdminRole indicates an administrative user role.
-	AdminRole = 2
+	AdminRole
 )
 
 func (r Role) String() string {

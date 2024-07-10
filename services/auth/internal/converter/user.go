@@ -34,6 +34,8 @@ func UserModelToProto(user *model.User) *desc.UserInfo {
 		role = desc.Role_USER
 	case model.AdminRole:
 		role = desc.Role_ADMIN
+	default:
+		role = desc.Role_NULL
 	}
 
 	return &desc.UserInfo{
