@@ -25,7 +25,7 @@ func NewUserGRPCHandlers(userService service.UserService) *ServerHandlers {
 func (h *ServerHandlers) Create(ctx context.Context, createIn *desc.CreateIn) (*desc.CreateOut, error) {
 	id, err := h.userService.RegisterUser(
 		ctx,
-		converter.UserRegisterProtoToModel(createIn.UserRegister),
+		converter.UserRegisterProtoToModel(createIn.GetUserRegister()),
 	)
 	if err != nil {
 		return nil, converter.ErrorModelToProto(err)
