@@ -4,7 +4,7 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/config"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository"
-	userRepositoy "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/user"
+	userRepository "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/user"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
 )
@@ -26,7 +26,7 @@ func (s *serviceProvider) Config() *config.Config {
 
 func (s *serviceProvider) UserRepository() repository.UserRepository {
 	if s.userRepository == nil {
-		s.userRepository = userRepositoy.NewRepository()
+		s.userRepository = userRepository.NewRepository()
 	}
 
 	return s.userRepository
