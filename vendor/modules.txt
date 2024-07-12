@@ -1,8 +1,3 @@
-## workspace
-# github.com/alisher-baizhumanov/chat-microservices/pkg v0.0.0 => ./pkg
-## explicit; go 1.22
-# github.com/alisher-baizhumanov/chat-microservices/protos v0.0.0 => ./protos
-## explicit; go 1.22
 # github.com/brianvoe/gofakeit/v7 v7.0.4
 ## explicit; go 1.22
 github.com/brianvoe/gofakeit/v7

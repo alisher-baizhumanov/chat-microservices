@@ -22,12 +22,8 @@ build:
 	go build -o ./bin/chat-server -mod vendor -v ./services/chat-server/
 
 tidy:
-	go work sync
-	cd pkg && go mod tidy && cd .. && \
-	cd protos && go mod tidy && cd .. && \
-	cd services/auth && go mod tidy && cd ../.. && \
-	cd services/chat-server && go mod tidy && cd ../..
-	go work vendor
+	go mod tidy
+	go mod vendor
 
 generate:
 	make generate-user-api
