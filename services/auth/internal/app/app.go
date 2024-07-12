@@ -6,6 +6,8 @@ import (
 	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
 	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1"
+
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/config"
 )
 
 // App represents the application with its services and gRPC server.
@@ -15,12 +17,13 @@ type App struct {
 }
 
 // NewApp creates and initializes a new App instance.
-func NewApp() (*App, error) {
+func NewApp(cfg *config.Config) (*App, error) {
 	app := &App{}
+
+	app.services.cfg = cfg
 
 	gRPCHandlers := app.services.ServerHandlers()
 
-	cfg := app.services.Config()
 	server, err := grpc.NewGRPCServer(cfg.GRPCServerPort, &desc.UserServiceV1_ServiceDesc, gRPCHandlers)
 	if err != nil {
 		return nil, err

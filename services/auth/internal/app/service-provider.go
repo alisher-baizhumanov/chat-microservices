@@ -17,10 +17,6 @@ type serviceProvider struct {
 }
 
 func (s *serviceProvider) Config() *config.Config {
-	if s.cfg == nil {
-		s.cfg = config.MustLoad()
-	}
-
 	return s.cfg
 }
 
