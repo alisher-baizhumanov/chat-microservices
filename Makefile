@@ -7,9 +7,9 @@ install:
 
 prepare:
 	make tidy
+	make lint
 	make test
 	make build
-	make lint
 
 lint:
 	GOBIN=$(LOCAL_BIN) golangci-lint run ./pkg/... ./services/auth/... ./services/chat-server/... --config .golangci.pipeline.yaml
