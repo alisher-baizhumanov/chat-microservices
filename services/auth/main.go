@@ -2,13 +2,10 @@ package main
 
 import (
 	"log"
-	"log/slog"
 
-	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/presentation/grpc"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/app"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/config"
 )
-
-const port = 55051
 
 func main() {
 	if err := run(); err != nil {
@@ -17,17 +14,15 @@ func main() {
 }
 
 func run() error {
-	server, err := grpc.NewGRPCServer(port)
+	cfg, err := config.Load()
 	if err != nil {
 		return err
 	}
 
-	server.Start()
-	defer server.Stop()
-	slog.Info("Starting gRPC Server", slog.Int64("port", port))
+	application, err := app.NewApp(cfg)
+	if err != nil {
+		return err
+	}
 
-	stop := gracefulshutdown.WaitSignal()
-	slog.Info("Stop application", slog.String("signal", stop.String()))
-
-	return nil
+	return application.Run()
 }

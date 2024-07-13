@@ -22,11 +22,8 @@ build:
 	go build -o ./bin/chat-server -mod vendor -v ./services/chat-server/
 
 tidy:
-	cd pkg && go mod tidy && cd .. && \
-	cd protos && go mod tidy && cd .. && \
-	cd services/auth && go mod tidy && cd ../.. && \
-	cd services/chat-server && go mod tidy && cd ../..
-	go work sync && go work vendor
+	go mod tidy
+	go mod vendor
 
 generate:
 	make generate-user-api
@@ -47,3 +44,9 @@ generate-chat-api:
     	--plugin=protoc-gen-go=bin/protoc-gen-go \
     	--go-grpc_out=protos/generated/chat-v1 --go-grpc_opt=paths=source_relative \
     	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc api/proto/chat-v1/chat.proto
+
+up:
+	docker-compose up --build --detach
+
+down:
+	docker-compose down --remove-orphans
