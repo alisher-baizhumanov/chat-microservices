@@ -1,13 +1,28 @@
 version: '3.8'
 
 services:
+  postgres:
+    container_name: chat-microservices-postgres
+    image: postgres:16.3-alpine3.20
+    ports:
+      - "55010:5432"
+    environment:
+      - "POSTGRES_DB=${PG_DATABASE_NAME}"
+      - "POSTGRES_USER=${PG_USER}"
+      - "POSTGRES_PASSWORD=${PG_PASSWORD}"
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+
   auth:
     container_name: chat-microservices-auth
+    depends_on:
+      - postgres
     build:
       context: .
       dockerfile: services/auth/Dockerfile
     ports:
       - "55051:55051"
+
   chat-server:
     container_name: chat-microservices-chat-server
     build:
@@ -15,3 +30,6 @@ services:
       dockerfile: services/chat-server/Dockerfile
     ports:
       - "55052:55052"
+
+volumes:
+  postgres-volume:
