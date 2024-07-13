@@ -10,8 +10,11 @@ services:
       - "POSTGRES_DB=${PG_DATABASE_NAME}"
       - "POSTGRES_USER=${PG_USER}"
       - "POSTGRES_PASSWORD=${PG_PASSWORD}"
+    restart: always
     volumes:
       - postgres-volume:/var/lib/postgresql/data
+    networks:
+      - inter-service-network
 
   auth:
     container_name: chat-microservices-auth
@@ -22,6 +25,12 @@ services:
       dockerfile: services/auth/Dockerfile
     ports:
       - "55051:55051"
+    environment:
+      - "GRPC_SERVER_PORT=55051"
+      - "DB_DSN=${POSTGRES_DB_DSN}"
+    restart: unless-stopped
+    networks:
+      - inter-service-network
 
   chat-server:
     container_name: chat-microservices-chat-server
@@ -30,6 +39,15 @@ services:
       dockerfile: services/chat-server/Dockerfile
     ports:
       - "55052:55052"
+    environment:
+      - "GRPC_SERVER_PORT=55052"
+      - "DB_DSN=${MONGO_DB_DSN}"
+    restart: unless-stopped
+    networks:
+      - inter-service-network
 
 volumes:
   postgres-volume:
+
+networks:
+  inter-service-network:
