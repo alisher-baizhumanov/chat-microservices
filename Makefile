@@ -1,9 +1,16 @@
+include .env
+
 LOCAL_BIN:=$(CURDIR)/bin
+
+LOCAL_MIGRATION_DIR=$(MIGRATIONS_DIR)
+LOCAL_MIGRATION_DSN="host=localhost port=55010 dbname=$(PG_DATABASE_NAME) user=$(PG_USER) password=$(PG_PASSWORD) sslmode=disable"
+MIGRATION_NAME=""
 
 install:
 	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1
 	GOBIN=$(LOCAL_BIN) go install -mod=mod google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.14.0
 
 prepare:
 	make tidy
@@ -53,3 +60,16 @@ stop:
 
 down:
 	docker-compose down --remove-orphans
+
+migration-status:
+	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} status -v
+
+
+migration-up:
+	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} up -v
+
+migration-down:
+	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} down -v
+
+migration-create:
+	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} create ${MIGRATION_NAME} sql
