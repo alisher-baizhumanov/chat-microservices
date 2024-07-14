@@ -4,6 +4,7 @@ go 1.22
 
 require (
 	github.com/brianvoe/gofakeit/v7 v7.0.4
+	github.com/caarlos0/env/v11 v11.1.0
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
 )
