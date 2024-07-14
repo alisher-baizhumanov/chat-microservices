@@ -43,7 +43,7 @@ func UserUpdateOptionModelToData(options *model.UserUpdateOptions) *data.UserUpd
 	}
 
 	var role *int8
-	if options.Role != nil {
+	if options.Role != nil && *options.Role != model.NullRole {
 		num := int8(*options.Role)
 		role = &num
 	}
