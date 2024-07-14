@@ -48,6 +48,8 @@ services:
 
 volumes:
   postgres-volume:
+    driver: local
 
 networks:
   inter-service-network:
+    driver: bridge

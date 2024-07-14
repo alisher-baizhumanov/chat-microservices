@@ -48,5 +48,8 @@ generate-chat-api:
 up:
 	docker-compose up --build --detach
 
+stop:
+	docker-compose stop
+
 down:
 	docker-compose down --remove-orphans
