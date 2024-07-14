@@ -5,6 +5,7 @@ import (
 	data "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/user/model"
 )
 
+// UserCreateModelToData converts model.UserCreate to data.UserCreate.
 func UserCreateModelToData(user *model.UserCreate) *data.UserCreate {
 	if user == nil {
 		return nil
@@ -19,6 +20,7 @@ func UserCreateModelToData(user *model.UserCreate) *data.UserCreate {
 	}
 }
 
+// UserDataToModel converts data.User to model.User.
 func UserDataToModel(user *data.User) *model.User {
 	if user == nil {
 		return nil
@@ -34,6 +36,7 @@ func UserDataToModel(user *data.User) *model.User {
 	}
 }
 
+// UserUpdateOptionModelToData converts model.UserUpdateOptions to data.UserUpdateOptions.
 func UserUpdateOptionModelToData(options *model.UserUpdateOptions) *data.UserUpdateOptions {
 	if options == nil {
 		return nil
