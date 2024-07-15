@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -22,7 +23,9 @@ func (r *Repository) UpdateUser(ctx context.Context, id int64, optionsConverted 
 
 	options := converter.UserUpdateOptionModelToData(optionsConverted)
 
-	builder := sq.Update("users").PlaceholderFormat(sq.Dollar)
+	builder := sq.Update("users").
+		PlaceholderFormat(sq.Dollar).
+		Set("updated_at", time.Now())
 
 	if options.Name != nil {
 		builder = builder.Set("name", *options.Name)
