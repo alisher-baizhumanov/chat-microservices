@@ -15,8 +15,8 @@ func (r *Repository) DeleteUser(ctx context.Context, id int64) error {
 		return model.ErrInvalidID
 	}
 
-	sql, args, err := sq.Delete("users").
-		Where(sq.Eq{"id": id}).
+	sql, args, err := sq.Delete(tableNameUser).
+		Where(sq.Eq{fieldID: id}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {

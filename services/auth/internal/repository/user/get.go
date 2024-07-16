@@ -19,9 +19,9 @@ func (r *Repository) GetUser(ctx context.Context, id int64) (*model.User, error)
 		return nil, model.ErrInvalidID
 	}
 
-	sql, args, err := sq.Select("name", "email", "role", "created_at", "updated_at").
-		From("users").
-		Where(sq.Eq{"id": id}).
+	sql, args, err := sq.Select(fieldName, fieldEmail, fieldRole, fieldCreatedAt, fieldUpdatedAt).
+		From(tableNameUser).
+		Where(sq.Eq{fieldID: id}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
