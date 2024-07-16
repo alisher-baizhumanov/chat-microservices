@@ -1,6 +1,9 @@
 package config
 
-import "github.com/caarlos0/env/v11"
+import (
+	"github.com/caarlos0/env/v11"
+	"github.com/google/uuid"
+)
 
 // Config holds configuration settings for the application.
 type Config struct {
@@ -10,6 +13,8 @@ type Config struct {
 
 // Load attempts to load the application configuration.
 func Load() (*Config, error) {
+	uuid.EnableRandPool()
+
 	cfg := &Config{}
 
 	if err := env.Parse(cfg); err != nil {
