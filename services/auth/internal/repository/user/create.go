@@ -20,10 +20,10 @@ func (r *Repository) CreateUser(ctx context.Context, userConverted *model.UserCr
 
 	user := converter.UserCreateModelToData(userConverted)
 
-	sql, args, err := sq.Insert("users").
-		Columns("name", "email", "hashed_password", "role", "created_at", "updated_at").
+	sql, args, err := sq.Insert(tableNameUser).
+		Columns(fieldName, fieldEmail, fieldRole, fieldCreatedAt, fieldUpdatedAt).
 		Values(user.Name, user.Email, user.HashedPassword, user.Role, user.CreatedAt, user.CreatedAt).
-		Suffix("RETURNING id").
+		Suffix("RETURNING " + fieldID).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
@@ -41,11 +41,11 @@ func (r *Repository) CreateUser(ctx context.Context, userConverted *model.UserCr
 func convertUniqueDBErr(err error) error {
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) {
-		if pgErr.Code == "23505" {
+		if pgErr.Code == postgresUniqueErrorCode {
 			switch pgErr.ConstraintName {
-			case "users_name_key":
+			case constraintFieldUserName:
 				return fmt.Errorf("%w, message: %s", model.ErrNonUniqueUsername, pgErr.Message)
-			case "users_email_key":
+			case constraintFieldEmail:
 				return fmt.Errorf("%w, message: %s", model.ErrNonUniqueEmail, pgErr.Message)
 			}
 		}

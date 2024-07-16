@@ -1,8 +1,11 @@
 package app
 
 import (
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository"
+	userRepository "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/user"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
 )
@@ -11,17 +14,28 @@ type serviceProvider struct {
 	_gRPCServer     *grpc.ServerHandlers
 	_userService    service.UserService
 	_userRepository repository.UserRepository
+	_connectionPool *pgxpool.Pool
 }
 
-func newServiceProvider(repo repository.UserRepository) serviceProvider {
-	return serviceProvider{_userRepository: repo}
+func newServiceProvider(connectionPool *pgxpool.Pool) serviceProvider {
+	return serviceProvider{_connectionPool: connectionPool}
+}
+
+func (s *serviceProvider) connectionPool() *pgxpool.Pool {
+	return s._connectionPool
 }
 
 func (s *serviceProvider) userRepository() repository.UserRepository {
+	if s._userRepository == nil {
+		s._userRepository = userRepository.NewRepository(
+			s.connectionPool(),
+		)
+	}
+
 	return s._userRepository
 }
 
-func (s *serviceProvider) UserService() service.UserService {
+func (s *serviceProvider) userService() service.UserService {
 	if s._userService == nil {
 		s._userService = userService.NewService(
 			s.userRepository(),
@@ -31,10 +45,10 @@ func (s *serviceProvider) UserService() service.UserService {
 	return s._userService
 }
 
-func (s *serviceProvider) ServerHandlers() *grpc.ServerHandlers {
+func (s *serviceProvider) serverHandlers() *grpc.ServerHandlers {
 	if s._gRPCServer == nil {
 		s._gRPCServer = grpc.NewUserGRPCHandlers(
-			s.UserService(),
+			s.userService(),
 		)
 	}
 

@@ -23,23 +23,23 @@ func (r *Repository) UpdateUser(ctx context.Context, id int64, optionsConverted 
 
 	options := converter.UserUpdateOptionModelToData(optionsConverted)
 
-	builder := sq.Update("users").
+	builder := sq.Update(tableNameUser).
 		PlaceholderFormat(sq.Dollar).
-		Set("updated_at", time.Now())
+		Set(fieldUpdatedAt, time.Now())
 
 	if options.Name != nil {
-		builder = builder.Set("name", *options.Name)
+		builder = builder.Set(fieldName, *options.Name)
 	}
 
 	if options.Email != nil {
-		builder = builder.Set("email", *options.Email)
+		builder = builder.Set(fieldEmail, *options.Email)
 	}
 
 	if options.Role != nil {
-		builder = builder.Set("role", *options.Role)
+		builder = builder.Set(fieldRole, *options.Role)
 	}
 
-	sql, args, err := builder.Where(sq.Eq{"id": id}).ToSql()
+	sql, args, err := builder.Where(sq.Eq{fieldID: id}).ToSql()
 	if err != nil {
 		return fmt.Errorf("%w, message: %w", model.ErrInvalidSQLQuery, err)
 	}
