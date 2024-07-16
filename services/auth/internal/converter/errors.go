@@ -18,11 +18,22 @@ func ErrorModelToProto(err error) error {
 
 	message := err.Error()
 	switch {
-	case errors.Is(err, model.ErrCanNotBeNil):
-		return status.Error(codes.InvalidArgument, message)
 	case errors.Is(err, model.ErrInvalidID):
-		return status.Errorf(codes.InvalidArgument, message)
+		return status.Error(codes.InvalidArgument, message)
+	case errors.Is(err, model.ErrInvalidSQLQuery):
+		return status.Error(codes.InvalidArgument, message)
+	case errors.Is(err, model.ErrNonUniqueEmail):
+		return status.Error(codes.InvalidArgument, "this email is already taken")
+	case errors.Is(err, model.ErrNonUniqueUsername):
+		return status.Error(codes.InvalidArgument, "this name is already taken")
+	case errors.Is(err, model.ErrNotFound):
+		return status.Error(codes.NotFound, "")
+
+	case errors.Is(err, model.ErrDatabase):
+		return status.Error(codes.Internal, message)
+	case errors.Is(err, model.ErrCanNotBeNil):
+		return status.Error(codes.InvalidArgument, "pointer does not exist")
 	default:
-		return status.Error(codes.Internal, "internal server error")
+		return status.Errorf(codes.Internal, "unknown error; message=\"%s\"", message)
 	}
 }

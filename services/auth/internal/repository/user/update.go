@@ -2,35 +2,56 @@ package user
 
 import (
 	"context"
-	"log/slog"
+	"fmt"
+	"time"
+
+	sq "github.com/Masterminds/squirrel"
 
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/user/converter"
 )
 
 // UpdateUser updates a user's information in the repository based on the provided user ID and update options.
-func (r *Repository) UpdateUser(ctx context.Context, id int64, options *model.UserUpdateOptions) (err error) {
+func (r *Repository) UpdateUser(ctx context.Context, id int64, optionsConverted *model.UserUpdateOptions) error {
 	if id < 1 {
 		return model.ErrInvalidID
 	}
 
-	if options == nil {
+	if optionsConverted == nil {
 		return model.ErrCanNotBeNil
 	}
 
-	log := slog.With("id", id)
+	options := converter.UserUpdateOptionModelToData(optionsConverted)
 
-	if options.Role != nil {
-		log = log.With(slog.String("role", (*options.Role).String()))
-	}
+	builder := sq.Update(tableNameUser).
+		PlaceholderFormat(sq.Dollar).
+		Set(fieldUpdatedAt, time.Now())
 
 	if options.Name != nil {
-		log = log.With(slog.String("name", *options.Name))
+		builder = builder.Set(fieldName, *options.Name)
 	}
 
 	if options.Email != nil {
-		log = log.With(slog.String("email", *options.Email))
+		builder = builder.Set(fieldEmail, *options.Email)
 	}
 
-	log.InfoContext(ctx, "update user")
+	if options.Role != nil {
+		builder = builder.Set(fieldRole, *options.Role)
+	}
+
+	sql, args, err := builder.Where(sq.Eq{fieldID: id}).ToSql()
+	if err != nil {
+		return fmt.Errorf("%w, message: %w", model.ErrInvalidSQLQuery, err)
+	}
+
+	res, err := r.pool.Exec(ctx, sql, args...)
+	if err != nil {
+		return convertUniqueDBErr(err)
+	}
+
+	if res.RowsAffected() == 0 {
+		return fmt.Errorf("%w, id: %d", model.ErrNotFound, id)
+	}
+
 	return nil
 }
