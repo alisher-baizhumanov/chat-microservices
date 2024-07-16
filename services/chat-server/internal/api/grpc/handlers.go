@@ -2,41 +2,62 @@ package grpc
 
 import (
 	"context"
-	"log/slog"
 
-	"github.com/brianvoe/gofakeit/v7"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/chat-v1"
+	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/converter"
+	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/service"
 )
 
+// ServerHandlers implements the desc.ChatServiceV1Server interface.
 type ServerHandlers struct {
 	desc.UnimplementedChatServiceV1Server
+
+	chatService    service.ChatService
+	messageService service.MessageService
 }
 
+// New creates a new instance of ServerHandlers with provided chatService and messageService.
+func New(chatService service.ChatService, messageService service.MessageService) *ServerHandlers {
+	return &ServerHandlers{
+		chatService:    chatService,
+		messageService: messageService,
+	}
+}
+
+// CreateChat handles the gRPC request to create a new chat.
 func (h *ServerHandlers) CreateChat(ctx context.Context, chat *desc.CreateChatIn) (*desc.CreateChatOut, error) {
-	slog.InfoContext(ctx, "created chat",
-		slog.Any("user_id_list", chat.GetChat().GetUserIdList()),
-		slog.String("name", chat.GetChat().GetName()),
+	id, err := h.chatService.Save(
+		ctx,
+		converter.ChatProtoToModel(chat.GetChat()),
 	)
+	if err != nil {
+		return nil, converter.ErrorModelToProto(err)
+	}
 
-	return &desc.CreateChatOut{Id: gofakeit.UUID()}, nil
+	return &desc.CreateChatOut{Id: id}, nil
 }
 
+// DeleteChat handles the gRPC request to delete a chat by its ID.
 func (h *ServerHandlers) DeleteChat(ctx context.Context, chat *desc.DeleteChatIn) (*emptypb.Empty, error) {
-	slog.InfoContext(ctx, "deleted chat",
-		slog.String("id", chat.GetId()),
-	)
+	err := h.chatService.Delete(ctx, chat.GetId())
+	if err != nil {
+		return nil, converter.ErrorModelToProto(err)
+	}
 
 	return nil, nil
 }
 
+// SendMessage handles the gRPC request to send a message.
 func (h *ServerHandlers) SendMessage(ctx context.Context, message *desc.SendMessageIn) (*desc.SendMessageOut, error) {
-	slog.InfoContext(ctx, "send message",
-		slog.Int64("user_id", message.GetMessage().GetUserId()),
-		slog.String("text", message.GetMessage().GetText()),
-		slog.String("chat_id", message.GetMessage().GetChatId()),
+	id, err := h.messageService.Send(
+		ctx,
+		converter.MessageProtoToModel(message.GetMessage()),
 	)
+	if err != nil {
+		return nil, converter.ErrorModelToProto(err)
+	}
 
-	return nil, nil
+	return &desc.SendMessageOut{Uuid: id}, nil
 }
