@@ -10,7 +10,7 @@ const (
 	tableNameUser = "users"
 
 	fieldID        = "id"
-	fieldName      = "name"
+	fieldName      = "nickname"
 	fieldEmail     = "email"
 	fieldRole      = "role"
 	fieldCreatedAt = "created_at"
