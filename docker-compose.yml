@@ -16,6 +16,17 @@ services:
     networks:
       - inter-service-network
 
+  migrator:
+    container_name: chat-microservices-migrator
+    depends_on:
+      - postgres
+    build:
+      context: .
+      dockerfile: migration.Dockerfile
+    restart: on-failure
+    networks:
+      - inter-service-network
+
   auth:
     container_name: chat-microservices-auth
     depends_on:
