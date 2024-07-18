@@ -17,6 +17,6 @@ type repository struct {
 }
 
 // New creates a new instance of the ChatRepository implementation.
-func New(client *mongo.Collection, participants *mongo.Collection) repositoryInterface.ChatRepository {
-	return &repository{collectionChat: client}
+func New(chat *mongo.Collection, participants *mongo.Collection) repositoryInterface.ChatRepository {
+	return &repository{collectionChat: chat, collectionParticipants: participants}
 }
