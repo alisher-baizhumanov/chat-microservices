@@ -1,11 +1,6 @@
 # github.com/Masterminds/squirrel v1.5.4
 ## explicit; go 1.14
 github.com/Masterminds/squirrel
-# github.com/brianvoe/gofakeit/v7 v7.0.4
-## explicit; go 1.22
-github.com/brianvoe/gofakeit/v7
-github.com/brianvoe/gofakeit/v7/data
-github.com/brianvoe/gofakeit/v7/source
 # github.com/caarlos0/env/v11 v11.1.0
 ## explicit; go 1.18
 github.com/caarlos0/env/v11
