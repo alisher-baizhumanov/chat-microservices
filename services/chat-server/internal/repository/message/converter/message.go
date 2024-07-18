@@ -7,6 +7,7 @@ import (
 	data "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository/message/model"
 )
 
+// MessageCreateModelToData converts a model.MessageCreate to a data.MessageCreate.
 func MessageCreateModelToData(message model.MessageCreate) (data.MessageCreate, error) {
 	chatID, err := primitive.ObjectIDFromHex(message.ChatID)
 	if err != nil {

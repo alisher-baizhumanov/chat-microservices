@@ -3,30 +3,31 @@ package chat
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/model"
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository/chat/converter"
+	data "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository/chat/model"
 )
 
 func (r *repository) Create(ctx context.Context, chatConverted model.ChatCreate, userIDList []int64) (string, error) {
 	chat := converter.ChatCreateModelToData(chatConverted)
+	chat.ID = primitive.NewObjectID()
 
-	res, err := r.collectionChat.InsertOne(ctx, chat)
-	if err != nil {
+	participants := data.NewParticipantList(userIDList, chat.ID, chat.CreatedAt)
+	documents := make([]interface{}, len(participants))
+	for i, participant := range participants {
+		documents[i] = participant
+	}
+
+	if _, err := r.collectionChat.InsertOne(ctx, chat); err != nil {
 		return "", fmt.Errorf("%w, message: %w", model.ErrDatabase, err)
 	}
 
-	id, ok := res.InsertedID.(primitive.ObjectID)
-	if !ok {
-		return "", fmt.Errorf("%w, message: error asserting primitive.ObjectID", model.ErrGeneratingID)
+	if _, err := r.collectionParticipants.InsertMany(ctx, documents); err != nil {
+		return "", fmt.Errorf("%w, message: %w", model.ErrDatabase, err)
 	}
 
-	slog.InfoContext(ctx, "created chat",
-		slog.Any("user_id_list", userIDList),
-	)
-
-	return id.Hex(), nil
+	return chat.ID.Hex(), nil
 }

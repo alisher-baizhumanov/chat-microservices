@@ -7,7 +7,10 @@ import (
 )
 
 const (
-	CollectionChat         = "chats"
+	// CollectionChat is the name of the MongoDB collection storing chat documents.
+	CollectionChat = "chats"
+
+	// CollectionParticipants is the name of the MongoDB collection storing participant documents.
 	CollectionParticipants = "participants"
 )
 

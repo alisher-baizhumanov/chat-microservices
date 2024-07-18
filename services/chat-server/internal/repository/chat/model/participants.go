@@ -6,9 +6,24 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// Participant represents a participant in a chat
 type Participant struct {
-	ID       primitive.ObjectID `bson:"_id,omitempty"`
 	ChatID   primitive.ObjectID `bson:"chatId"`
-	UserID   int                `bson:"userId"`
+	UserID   int64              `bson:"userId"`
 	JoinedAt time.Time          `bson:"joinedAt"`
+}
+
+// NewParticipantList creates a list of Participant from a list of user IDs
+func NewParticipantList(userIDList []int64, chatID primitive.ObjectID, joinedAt time.Time) []Participant {
+	participants := make([]Participant, len(userIDList))
+
+	for i, userID := range userIDList {
+		participants[i] = Participant{
+			ChatID:   chatID,
+			UserID:   userID,
+			JoinedAt: joinedAt,
+		}
+	}
+
+	return participants
 }

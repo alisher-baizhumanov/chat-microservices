@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	// CollectionMessages is the name of the MongoDB collection storing messages documents.
 	CollectionMessages = "messages"
 )
 

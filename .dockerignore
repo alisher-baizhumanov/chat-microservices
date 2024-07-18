@@ -3,3 +3,8 @@ bin
 .idea
 .golangci.pipeline.yaml
 .gitignore
+.env
+.env.debug
+docker-compose.yml
+Makefile
+README.md

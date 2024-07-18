@@ -59,7 +59,7 @@ stop:
 	docker-compose stop
 
 down:
-	docker-compose down --remove-orphans
+	docker-compose down --remove-orphans --volumes
 
 migration-status:
 	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} status -v
