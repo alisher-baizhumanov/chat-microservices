@@ -13,7 +13,7 @@ import (
 )
 
 type serviceProvider struct {
-	_mongoClient    *mongo.Client
+	_mongoDatabase  *mongo.Database
 	_chatRepo       repository.ChatRepository
 	_messageRepo    repository.MessageRepository
 	_chatService    service.ChatService
@@ -21,17 +21,22 @@ type serviceProvider struct {
 	_gRPCServer     *grpc.ServerHandlers
 }
 
-func newServiceProvider(mongoClient *mongo.Client) serviceProvider {
-	return serviceProvider{_mongoClient: mongoClient}
+func newServiceProvider(mongoClient *mongo.Database) serviceProvider {
+	return serviceProvider{_mongoDatabase: mongoClient}
 }
 
-func (s *serviceProvider) MongoClient() *mongo.Client {
-	return s._mongoClient
+func (s *serviceProvider) MongoDatabase() *mongo.Database {
+	return s._mongoDatabase
 }
 
 func (s *serviceProvider) ChatRepository() repository.ChatRepository {
 	if s._chatRepo == nil {
-		s._chatRepo = chatRepository.New(s.MongoClient())
+		db := s.MongoDatabase()
+
+		s._chatRepo = chatRepository.New(
+			db.Collection(chatRepository.CollectionChat),
+			db.Collection(chatRepository.CollectionParticipants),
+		)
 	}
 
 	return s._chatRepo
@@ -39,7 +44,11 @@ func (s *serviceProvider) ChatRepository() repository.ChatRepository {
 
 func (s *serviceProvider) MessageRepository() repository.MessageRepository {
 	if s._messageRepo == nil {
-		s._messageRepo = messageRepository.New(s.MongoClient())
+		db := s.MongoDatabase()
+
+		s._messageRepo = messageRepository.New(
+			db.Collection(messageRepository.CollectionMessages),
+		)
 	}
 
 	return s._messageRepo

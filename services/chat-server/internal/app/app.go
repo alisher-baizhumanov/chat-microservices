@@ -27,7 +27,7 @@ func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
 		return nil, err
 	}
 
-	services := newServiceProvider(mongoClient)
+	services := newServiceProvider(mongoClient.Database(cfg.Database))
 
 	gRPCHandlers := services.ServerHandlers()
 

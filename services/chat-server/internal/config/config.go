@@ -9,6 +9,7 @@ import (
 type Config struct {
 	GRPCServerPort int    `env:"GRPC_SERVER_PORT,required"`
 	DSN            string `env:"DB_DSN,required"`
+	Database       string `env:"DATABASE,required"`
 }
 
 // Load attempts to load the application configuration.

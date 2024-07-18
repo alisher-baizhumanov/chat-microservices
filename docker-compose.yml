@@ -42,6 +42,7 @@ services:
     environment:
       - "GRPC_SERVER_PORT=55052"
       - "DB_DSN=${MONGO_DB_DSN}"
+      - "DATABASE=${MONGO_DATABASE_NAME}"
     restart: unless-stopped
     networks:
       - inter-service-network
