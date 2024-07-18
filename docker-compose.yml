@@ -32,8 +32,25 @@ services:
     networks:
       - inter-service-network
 
+  mongo:
+    container_name: chat-microservices-mongo
+    image: mongo:8.0.0-rc11
+    ports:
+      - "55012:27017"
+    environment:
+      - "MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}"
+      - "MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}"
+      - "MONGO_INITDB_DATABASE=${MONGO_DATABASE_NAME}"
+    restart: always
+    volumes:
+      - mongo-volume:/data/db
+    networks:
+      - inter-service-network
+
   chat-server:
     container_name: chat-microservices-chat-server
+    depends_on:
+      - mongo
     build:
       context: .
       dockerfile: services/chat-server/Dockerfile
@@ -49,6 +66,8 @@ services:
 
 volumes:
   postgres-volume:
+    driver: local
+  mongo-volume:
     driver: local
 
 networks:
