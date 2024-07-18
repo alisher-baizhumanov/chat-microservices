@@ -22,7 +22,7 @@ services:
       - postgres
     build:
       context: .
-      dockerfile: migration.Dockerfile
+      dockerfile: services/migrator/Dockerfile
     restart: on-failure
     networks:
       - inter-service-network
