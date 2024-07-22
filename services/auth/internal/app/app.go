@@ -4,11 +4,11 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
 	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1"
-	"github.com/jackc/pgx/v5/pgxpool"
-
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/config"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/postgres"
 )
