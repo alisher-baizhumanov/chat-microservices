@@ -1,23 +1,23 @@
 package user
 
 import (
-	"github.com/jackc/pgx/v5/pgxpool"
-
+	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
 	def "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository"
 )
 
 const (
-	tableNameUser = "users"
+	tableUser = "users"
 
-	fieldID        = "id"
-	fieldName      = "nickname"
-	fieldEmail     = "email"
-	fieldRole      = "role"
-	fieldCreatedAt = "created_at"
-	fieldUpdatedAt = "updated_at"
+	columnID             = "id"
+	columnName           = "nickname"
+	columnEmail          = "email"
+	columndRole          = "role"
+	columnCreatedAt      = "created_at"
+	columnUpdatedAt      = "updated_at"
+	columnHashedPassword = "hashed_password"
 
-	constraintFieldUserName = tableNameUser + "_" + fieldName + "_key"
-	constraintFieldEmail    = tableNameUser + "_" + fieldEmail + "_key"
+	constraintFieldUserName = tableUser + "_" + columnName + "_key"
+	constraintFieldEmail    = tableUser + "_" + columnEmail + "_key"
 
 	postgresUniqueErrorCode = "23505"
 )
@@ -26,10 +26,10 @@ var _ def.UserRepository = (*Repository)(nil)
 
 // Repository represents a storage for user data.
 type Repository struct {
-	pool *pgxpool.Pool
+	client db.Client
 }
 
 // NewRepository creates and returns a new Repository instance.
-func NewRepository(pool *pgxpool.Pool) *Repository {
-	return &Repository{pool: pool}
+func NewRepository(client db.Client) *Repository {
+	return &Repository{client: client}
 }

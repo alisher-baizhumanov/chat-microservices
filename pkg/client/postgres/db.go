@@ -41,15 +41,15 @@ type SQLExecer interface {
 
 // NamedExecer - an interface for working with named queries using struct tags.
 type NamedExecer interface {
-	ScanOneContext(ctx context.Context, dest interface{}, q Query, args ...interface{}) error
-	ScanAllContext(ctx context.Context, dest interface{}, q Query, args ...interface{}) error
+	ScanOne(ctx context.Context, dest any, q Query, args ...any) error
+	ScanAll(ctx context.Context, dest any, q Query, args ...any) error
 }
 
 // QueryExecer - an interface for working with regular queries.
 type QueryExecer interface {
-	ExecContext(ctx context.Context, q Query, args ...interface{}) (pgconn.CommandTag, error)
-	QueryContext(ctx context.Context, q Query, args ...interface{}) (pgx.Rows, error)
-	QueryRowContext(ctx context.Context, q Query, args ...interface{}) pgx.Row
+	Exec(ctx context.Context, q Query, args ...any) (pgconn.CommandTag, error)
+	Query(ctx context.Context, q Query, args ...any) (pgx.Rows, error)
+	QueryRow(ctx context.Context, q Query, args ...any) pgx.Row
 }
 
 // Pinger - an interface for checking the database connection.

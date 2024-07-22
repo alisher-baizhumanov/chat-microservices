@@ -31,11 +31,11 @@ func NewDB(dbc *pgxpool.Pool) postgres.DB {
 	}
 }
 
-// ScanOneContext executes a query and scans the result into the provided destination.
-func (p *pg) ScanOneContext(ctx context.Context, dest interface{}, q postgres.Query, args ...interface{}) error {
+// ScanOne executes a query and scans the result into the provided destination.
+func (p *pg) ScanOne(ctx context.Context, dest any, q postgres.Query, args ...any) error {
 	logQuery(ctx, q, args...)
 
-	row, err := p.QueryContext(ctx, q, args...)
+	row, err := p.Query(ctx, q, args...)
 	if err != nil {
 		return err
 	}
@@ -43,11 +43,11 @@ func (p *pg) ScanOneContext(ctx context.Context, dest interface{}, q postgres.Qu
 	return pgxscan.ScanOne(dest, row)
 }
 
-// ScanAllContext executes a query and scans all the results into the provided destination.
-func (p *pg) ScanAllContext(ctx context.Context, dest interface{}, q postgres.Query, args ...interface{}) error {
+// ScanAll executes a query and scans all the results into the provided destination.
+func (p *pg) ScanAll(ctx context.Context, dest any, q postgres.Query, args ...any) error {
 	logQuery(ctx, q, args...)
 
-	rows, err := p.QueryContext(ctx, q, args...)
+	rows, err := p.Query(ctx, q, args...)
 	if err != nil {
 		return err
 	}
@@ -55,8 +55,8 @@ func (p *pg) ScanAllContext(ctx context.Context, dest interface{}, q postgres.Qu
 	return pgxscan.ScanAll(dest, rows)
 }
 
-// ExecContext executes a query without returning any rows.
-func (p *pg) ExecContext(ctx context.Context, q postgres.Query, args ...interface{}) (pgconn.CommandTag, error) {
+// Exec executes a query without returning any rows.
+func (p *pg) Exec(ctx context.Context, q postgres.Query, args ...any) (pgconn.CommandTag, error) {
 	logQuery(ctx, q, args...)
 
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
@@ -67,8 +67,8 @@ func (p *pg) ExecContext(ctx context.Context, q postgres.Query, args ...interfac
 	return p.dbc.Exec(ctx, q.QueryRaw, args...)
 }
 
-// QueryContext executes a query and returns the resulting rows.
-func (p *pg) QueryContext(ctx context.Context, q postgres.Query, args ...interface{}) (pgx.Rows, error) {
+// Query executes a query and returns the resulting rows.
+func (p *pg) Query(ctx context.Context, q postgres.Query, args ...any) (pgx.Rows, error) {
 	logQuery(ctx, q, args...)
 
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
@@ -79,8 +79,8 @@ func (p *pg) QueryContext(ctx context.Context, q postgres.Query, args ...interfa
 	return p.dbc.Query(ctx, q.QueryRaw, args...)
 }
 
-// QueryRowContext executes a query and returns a single row.
-func (p *pg) QueryRowContext(ctx context.Context, q postgres.Query, args ...interface{}) pgx.Row {
+// QueryRow executes a query and returns a single row.
+func (p *pg) QueryRow(ctx context.Context, q postgres.Query, args ...any) pgx.Row {
 	logQuery(ctx, q, args...)
 
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
@@ -111,7 +111,7 @@ func MakeContextTx(ctx context.Context, tx pgx.Tx) context.Context {
 	return context.WithValue(ctx, TxKey, tx)
 }
 
-func logQuery(ctx context.Context, q postgres.Query, args ...interface{}) {
+func logQuery(ctx context.Context, q postgres.Query, args ...any) {
 	if slog.Default().Enabled(ctx, slog.LevelDebug) {
 		prettyQuery := prettier.Pretty(q.QueryRaw, prettier.PlaceholderDollar, args...)
 		slog.DebugContext(

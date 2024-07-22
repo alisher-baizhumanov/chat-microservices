@@ -1,8 +1,7 @@
 package app
 
 import (
-	"github.com/jackc/pgx/v5/pgxpool"
-
+	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository"
 	userRepository "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/user"
@@ -14,15 +13,15 @@ type serviceProvider struct {
 	_gRPCServer     *grpc.ServerHandlers
 	_userService    service.UserService
 	_userRepository repository.UserRepository
-	_connectionPool *pgxpool.Pool
+	_dbClient       db.Client
 }
 
-func newServiceProvider(connectionPool *pgxpool.Pool) serviceProvider {
-	return serviceProvider{_connectionPool: connectionPool}
+func newServiceProvider(dbClient db.Client) serviceProvider {
+	return serviceProvider{_dbClient: dbClient}
 }
 
-func (s *serviceProvider) connectionPool() *pgxpool.Pool {
-	return s._connectionPool
+func (s *serviceProvider) connectionPool() db.Client {
+	return s._dbClient
 }
 
 func (s *serviceProvider) userRepository() repository.UserRepository {
