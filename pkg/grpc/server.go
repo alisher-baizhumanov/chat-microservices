@@ -35,7 +35,7 @@ func NewGRPCServer(port int, serviceDesc *grpc.ServiceDesc, handlers any) (*Serv
 	if err != nil {
 		return nil, err
 	}
-	
+
 	gRPCServer := grpc.NewServer()
 	reflection.Register(gRPCServer)
 	gRPCServer.RegisterService(serviceDesc, handlers)

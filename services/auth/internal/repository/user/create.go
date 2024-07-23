@@ -8,6 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgconn"
 
+	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/user/converter"
 )
@@ -20,18 +21,23 @@ func (r *Repository) CreateUser(ctx context.Context, userConverted *model.UserCr
 
 	user := converter.UserCreateModelToData(userConverted)
 
-	sql, args, err := sq.Insert(tableNameUser).
-		Columns(fieldName, fieldEmail, fieldRole, fieldCreatedAt, fieldUpdatedAt).
+	sql, args, err := sq.Insert(tableUser).
+		Columns(columnName, columnEmail, columnHashedPassword, columndRole, columnCreatedAt, columnUpdatedAt).
 		Values(user.Name, user.Email, user.HashedPassword, user.Role, user.CreatedAt, user.CreatedAt).
-		Suffix("RETURNING " + fieldID).
+		Suffix("RETURNING " + columnID).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
 		return 0, fmt.Errorf("%w, message: %w", model.ErrInvalidSQLQuery, err)
 	}
 
+	q := db.Query{
+		Name:     "user_repository.Create",
+		QueryRaw: sql,
+	}
+
 	var id int64
-	if err := r.pool.QueryRow(ctx, sql, args...).Scan(&id); err != nil {
+	if err := r.client.DB().QueryRow(ctx, q, args...).Scan(&id); err != nil {
 		return 0, convertUniqueDBErr(err)
 	}
 
