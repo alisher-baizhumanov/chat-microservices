@@ -1,6 +1,8 @@
 package config
 
 import (
+	"log/slog"
+
 	"github.com/caarlos0/env/v11"
 	"github.com/google/uuid"
 )
@@ -14,6 +16,8 @@ type Config struct {
 
 // Load attempts to load the application configuration.
 func Load() (*Config, error) {
+	slog.SetLogLoggerLevel(slog.LevelDebug)
+
 	uuid.EnableRandPool()
 
 	cfg := &Config{}
