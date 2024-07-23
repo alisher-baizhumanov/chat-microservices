@@ -14,7 +14,7 @@ func (r *repository) CreateMessage(ctx context.Context, messageConverted model.M
 		return fmt.Errorf("%w, message: %w", model.ErrInvalidID, err)
 	}
 
-	_, err = r.collectionMessages.InsertOne(ctx, message)
+	_, err = r.collectionMessages.InsertOne(ctx, "message.Create", message)
 	if err != nil {
 		return fmt.Errorf("%w, message: %w", model.ErrDatabase, err)
 	}

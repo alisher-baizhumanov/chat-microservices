@@ -4,9 +4,8 @@ import (
 	"context"
 	"log/slog"
 
-	mongoLibrary "go.mongodb.org/mongo-driver/mongo"
-
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo"
+	mg "github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo/mg"
 	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
 	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/chat-v1"
@@ -15,19 +14,23 @@ import (
 
 // App represents the application with its services and gRPC server.
 type App struct {
-	cfg         *config.Config
-	server      *grpc.Server
-	mongoClient *mongoLibrary.Client
+	cfg    *config.Config
+	server *grpc.Server
+	client mongo.Client
 }
 
 // NewApp creates and initializes a new App instance.
 func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
-	mongoClient, err := mongo.NewConnectionPool(ctx, cfg.DSN)
+	client, err := mg.NewClient(ctx, cfg.DSN, cfg.Database)
 	if err != nil {
 		return nil, err
 	}
 
-	services := newServiceProvider(mongoClient.Database(cfg.Database))
+	if err = client.Ping(ctx); err != nil {
+		return nil, err
+	}
+
+	services := newServiceProvider(client)
 
 	gRPCHandlers := services.ServerHandlers()
 
@@ -37,16 +40,16 @@ func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
 	}
 
 	return &App{
-		cfg:         cfg,
-		server:      server,
-		mongoClient: mongoClient,
+		cfg:    cfg,
+		server: server,
+		client: client,
 	}, nil
 }
 
 // Run starts the gRPC server and waits for a termination signal to gracefully shut down the server.
-func (a *App) Run(ctx context.Context) error {
+func (a *App) Run(ctx context.Context) {
 	defer func() {
-		if err := mongo.CloseConnectionPool(ctx, a.mongoClient); err != nil {
+		if err := a.client.Close(ctx); err != nil {
 			slog.Warn("error to close connection to DB",
 				slog.Any("error", err),
 			)
@@ -61,6 +64,4 @@ func (a *App) Run(ctx context.Context) error {
 
 	stop := gracefulshutdown.WaitSignal()
 	slog.Info("Stop application", slog.String("signal", stop.String()))
-
-	return nil
 }

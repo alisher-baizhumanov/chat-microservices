@@ -1,8 +1,7 @@
 package app
 
 import (
-	"go.mongodb.org/mongo-driver/mongo"
-
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo"
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/api/grpc"
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository"
 	chatRepository "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository/chat"
@@ -13,7 +12,7 @@ import (
 )
 
 type serviceProvider struct {
-	_mongoDatabase  *mongo.Database
+	_mongoDatabase  mongo.Client
 	_chatRepo       repository.ChatRepository
 	_messageRepo    repository.MessageRepository
 	_chatService    service.ChatService
@@ -21,11 +20,11 @@ type serviceProvider struct {
 	_gRPCServer     *grpc.ServerHandlers
 }
 
-func newServiceProvider(mongoClient *mongo.Database) serviceProvider {
+func newServiceProvider(mongoClient mongo.Client) serviceProvider {
 	return serviceProvider{_mongoDatabase: mongoClient}
 }
 
-func (s *serviceProvider) MongoDatabase() *mongo.Database {
+func (s *serviceProvider) MongoDatabase() mongo.Client {
 	return s._mongoDatabase
 }
 

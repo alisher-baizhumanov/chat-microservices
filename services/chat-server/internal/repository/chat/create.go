@@ -16,16 +16,16 @@ func (r *repository) Create(ctx context.Context, chatConverted model.ChatCreate,
 	chat.ID = primitive.NewObjectID()
 
 	participants := data.NewParticipantList(userIDList, chat.ID, chat.CreatedAt)
-	documents := make([]interface{}, len(participants))
+	documents := make([]any, len(participants))
 	for i, participant := range participants {
 		documents[i] = participant
 	}
 
-	if _, err := r.collectionChat.InsertOne(ctx, chat); err != nil {
+	if _, err := r.collectionChat.InsertOne(ctx, "chat.Create", chat); err != nil {
 		return "", fmt.Errorf("%w, message: %w", model.ErrDatabase, err)
 	}
 
-	if _, err := r.collectionParticipants.InsertMany(ctx, documents); err != nil {
+	if err := r.collectionParticipants.InsertMany(ctx, "participant.InitChat", documents); err != nil {
 		return "", fmt.Errorf("%w, message: %w", model.ErrDatabase, err)
 	}
 

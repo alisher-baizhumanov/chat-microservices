@@ -1,8 +1,7 @@
 package message
 
 import (
-	"go.mongodb.org/mongo-driver/mongo"
-
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo"
 	repositoryInterface "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository"
 )
 
@@ -12,10 +11,10 @@ const (
 )
 
 type repository struct {
-	collectionMessages *mongo.Collection
+	collectionMessages mongo.Collection
 }
 
 // New creates a new instance of the MessageRepository implementation.
-func New(collectionMessages *mongo.Collection) repositoryInterface.MessageRepository {
+func New(collectionMessages mongo.Collection) repositoryInterface.MessageRepository {
 	return &repository{collectionMessages: collectionMessages}
 }

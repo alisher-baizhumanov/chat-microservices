@@ -2,31 +2,28 @@ package chat
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-
+	mg "github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo/mg"
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/model"
 )
 
 func (r *repository) DeleteByID(ctx context.Context, id string) error {
-	objectID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return fmt.Errorf("%w, message: %w", model.ErrInvalidID, err)
-	}
-
-	filter := bson.M{"_id": objectID}
-	update := bson.M{
-		"$set": bson.M{
+	update := map[string]any{
+		"$set": map[string]any{
 			"deletedAt": time.Now(),
 		},
 	}
 
-	_, err = r.collectionChat.UpdateOne(ctx, filter, update)
-	if err != nil {
+	if err := r.collectionChat.UpdateByID(ctx, "chat.Delete", id, update); err != nil {
+		if errors.Is(err, mg.ErrInvalidID) {
+			return fmt.Errorf("%w, message: %w", model.ErrInvalidID, err)
+		}
+
 		return fmt.Errorf("%w, message: %w", model.ErrDatabase, err)
+
 	}
 
 	return nil

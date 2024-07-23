@@ -1,8 +1,7 @@
 package chat
 
 import (
-	"go.mongodb.org/mongo-driver/mongo"
-
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo"
 	repositoryInterface "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository"
 )
 
@@ -15,11 +14,11 @@ const (
 )
 
 type repository struct {
-	collectionChat         *mongo.Collection
-	collectionParticipants *mongo.Collection
+	collectionChat         mongo.Collection
+	collectionParticipants mongo.Collection
 }
 
 // New creates a new instance of the ChatRepository implementation.
-func New(chat *mongo.Collection, participants *mongo.Collection) repositoryInterface.ChatRepository {
+func New(chat mongo.Collection, participants mongo.Collection) repositoryInterface.ChatRepository {
 	return &repository{collectionChat: chat, collectionParticipants: participants}
 }
