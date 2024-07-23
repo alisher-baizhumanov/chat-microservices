@@ -4,13 +4,13 @@ import (
 	"context"
 	"log/slog"
 
+	mongoLibrary "go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo"
 	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
 	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/chat-v1"
-	mongoLibrary "go.mongodb.org/mongo-driver/mongo"
-
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/config"
-	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository/mongo"
 )
 
 // App represents the application with its services and gRPC server.

@@ -38,3 +38,17 @@ func CloseConnectionPool(ctx context.Context, pool *mongo.Client) error {
 
 	return pool.Disconnect(ctx)
 }
+
+// Client - a client for interacting with the database.
+type Client interface {
+	Collection(collectionName string) Collection
+	Close(ctx context.Context) error
+	Ping(ctx context.Context) error
+}
+
+// Collection - an interface for interacting with a collecion.
+type Collection interface {
+	InsertOne(ctx context.Context, queryName string, document any) (id [12]byte, err error)
+	InsertMany(ctx context.Context, queryName string, document any) error
+	UpdateOne(ctx context.Context, queryName string, filter map[string]any, update map[string]any) error
+}
