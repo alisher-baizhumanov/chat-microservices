@@ -48,7 +48,7 @@ type Client interface {
 
 // Collection - an interface for interacting with a collecion.
 type Collection interface {
-	InsertOne(ctx context.Context, queryName string, document any) (id [12]byte, err error)
-	InsertMany(ctx context.Context, queryName string, document any) error
+	InsertOne(ctx context.Context, queryName string, document any) (string, error)
+	InsertMany(ctx context.Context, queryName string, documents []any) error
 	UpdateOne(ctx context.Context, queryName string, filter map[string]any, update map[string]any) error
 }
