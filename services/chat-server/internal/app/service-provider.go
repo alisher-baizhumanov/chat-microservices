@@ -12,74 +12,74 @@ import (
 )
 
 type serviceProvider struct {
-	_mongoDatabase  mongo.Client
-	_chatRepo       repository.ChatRepository
-	_messageRepo    repository.MessageRepository
-	_chatService    service.ChatService
-	_messageService service.MessageService
-	_gRPCServer     *grpc.ServerHandlers
+	mongoDatabase     mongo.Client
+	chatRepository    repository.ChatRepository
+	messageRepository repository.MessageRepository
+	chatService       service.ChatService
+	messageService    service.MessageService
+	gRPCServer        *grpc.ServerHandlers
 }
 
 func newServiceProvider(mongoClient mongo.Client) serviceProvider {
-	return serviceProvider{_mongoDatabase: mongoClient}
+	return serviceProvider{mongoDatabase: mongoClient}
 }
 
-func (s *serviceProvider) MongoDatabase() mongo.Client {
-	return s._mongoDatabase
+func (s *serviceProvider) getMongoDatabase() mongo.Client {
+	return s.mongoDatabase
 }
 
-func (s *serviceProvider) ChatRepository() repository.ChatRepository {
-	if s._chatRepo == nil {
-		db := s.MongoDatabase()
+func (s *serviceProvider) getChatRepository() repository.ChatRepository {
+	if s.chatRepository == nil {
+		db := s.getMongoDatabase()
 
-		s._chatRepo = chatRepository.New(
+		s.chatRepository = chatRepository.New(
 			db.Collection(chatRepository.CollectionChat),
 			db.Collection(chatRepository.CollectionParticipants),
 		)
 	}
 
-	return s._chatRepo
+	return s.chatRepository
 }
 
-func (s *serviceProvider) MessageRepository() repository.MessageRepository {
-	if s._messageRepo == nil {
-		db := s.MongoDatabase()
+func (s *serviceProvider) getMessageRepository() repository.MessageRepository {
+	if s.messageRepository == nil {
+		db := s.getMongoDatabase()
 
-		s._messageRepo = messageRepository.New(
+		s.messageRepository = messageRepository.New(
 			db.Collection(messageRepository.CollectionMessages),
 		)
 	}
 
-	return s._messageRepo
+	return s.messageRepository
 }
 
-func (s *serviceProvider) ChatService() service.ChatService {
-	if s._chatService == nil {
-		s._chatService = chatService.New(
-			s.ChatRepository(),
+func (s *serviceProvider) getChatService() service.ChatService {
+	if s.chatService == nil {
+		s.chatService = chatService.New(
+			s.getChatRepository(),
 		)
 	}
 
-	return s._chatService
+	return s.chatService
 }
 
-func (s *serviceProvider) MessageService() service.MessageService {
-	if s._messageService == nil {
-		s._messageService = messageService.New(
-			s.MessageRepository(),
+func (s *serviceProvider) getMessageService() service.MessageService {
+	if s.messageService == nil {
+		s.messageService = messageService.New(
+			s.getMessageRepository(),
 		)
 	}
 
-	return s._messageService
+	return s.messageService
 }
 
-func (s *serviceProvider) ServerHandlers() *grpc.ServerHandlers {
-	if s._gRPCServer == nil {
-		s._gRPCServer = grpc.New(
-			s.ChatService(),
-			s.MessageService(),
+func (s *serviceProvider) getServerHandlers() *grpc.ServerHandlers {
+	if s.gRPCServer == nil {
+		s.gRPCServer = grpc.New(
+			s.getChatService(),
+			s.getMessageService(),
 		)
 	}
 
-	return s._gRPCServer
+	return s.gRPCServer
 }
