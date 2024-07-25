@@ -32,7 +32,7 @@ func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
 
 	services := newServiceProvider(dbClient)
 
-	gRPCHandlers := services.GRPCServerHandlers()
+	gRPCHandlers := services.getGRPCServerHandlers()
 
 	server, err := grpc.NewGRPCServer(cfg.GRPCServerPort, &desc.UserServiceV1_ServiceDesc, gRPCHandlers)
 	if err != nil {

@@ -20,34 +20,34 @@ func newServiceProvider(dbClient db.Client) serviceProvider {
 	return serviceProvider{dbClient: dbClient}
 }
 
-func (s *serviceProvider) DBClient() db.Client {
+func (s *serviceProvider) getDBClient() db.Client {
 	return s.dbClient
 }
 
-func (s *serviceProvider) UserRepository() repository.UserRepository {
+func (s *serviceProvider) getUserRepository() repository.UserRepository {
 	if s.userRepository == nil {
 		s.userRepository = userRepository.NewRepository(
-			s.DBClient(),
+			s.getDBClient(),
 		)
 	}
 
 	return s.userRepository
 }
 
-func (s *serviceProvider) UserService() service.UserService {
+func (s *serviceProvider) getUserService() service.UserService {
 	if s.userService == nil {
 		s.userService = userService.NewService(
-			s.UserRepository(),
+			s.getUserRepository(),
 		)
 	}
 
 	return s.userService
 }
 
-func (s *serviceProvider) GRPCServerHandlers() *grpc.ServerHandlers {
+func (s *serviceProvider) getGRPCServerHandlers() *grpc.ServerHandlers {
 	if s.gRPCServerHandlers == nil {
 		s.gRPCServerHandlers = grpc.NewUserGRPCHandlers(
-			s.UserService(),
+			s.getUserService(),
 		)
 	}
 
