@@ -10,46 +10,46 @@ import (
 )
 
 type serviceProvider struct {
-	_gRPCServer     *grpc.ServerHandlers
-	_userService    service.UserService
-	_userRepository repository.UserRepository
-	_dbClient       db.Client
+	gRPCServerHandlers *grpc.ServerHandlers
+	userService        service.UserService
+	userRepository     repository.UserRepository
+	dbClient           db.Client
 }
 
 func newServiceProvider(dbClient db.Client) serviceProvider {
-	return serviceProvider{_dbClient: dbClient}
+	return serviceProvider{dbClient: dbClient}
 }
 
-func (s *serviceProvider) connectionPool() db.Client {
-	return s._dbClient
+func (s *serviceProvider) DBClient() db.Client {
+	return s.dbClient
 }
 
-func (s *serviceProvider) userRepository() repository.UserRepository {
-	if s._userRepository == nil {
-		s._userRepository = userRepository.NewRepository(
-			s.connectionPool(),
+func (s *serviceProvider) UserRepository() repository.UserRepository {
+	if s.userRepository == nil {
+		s.userRepository = userRepository.NewRepository(
+			s.DBClient(),
 		)
 	}
 
-	return s._userRepository
+	return s.userRepository
 }
 
-func (s *serviceProvider) userService() service.UserService {
-	if s._userService == nil {
-		s._userService = userService.NewService(
-			s.userRepository(),
+func (s *serviceProvider) UserService() service.UserService {
+	if s.userService == nil {
+		s.userService = userService.NewService(
+			s.UserRepository(),
 		)
 	}
 
-	return s._userService
+	return s.userService
 }
 
-func (s *serviceProvider) serverHandlers() *grpc.ServerHandlers {
-	if s._gRPCServer == nil {
-		s._gRPCServer = grpc.NewUserGRPCHandlers(
-			s.userService(),
+func (s *serviceProvider) GRPCServerHandlers() *grpc.ServerHandlers {
+	if s.gRPCServerHandlers == nil {
+		s.gRPCServerHandlers = grpc.NewUserGRPCHandlers(
+			s.UserService(),
 		)
 	}
 
-	return s._gRPCServer
+	return s.gRPCServerHandlers
 }
