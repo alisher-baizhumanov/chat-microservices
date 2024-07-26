@@ -1,8 +1,7 @@
 package app
 
 import (
-	"github.com/jackc/pgx/v5/pgxpool"
-
+	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository"
 	userRepository "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/user"
@@ -11,46 +10,46 @@ import (
 )
 
 type serviceProvider struct {
-	_gRPCServer     *grpc.ServerHandlers
-	_userService    service.UserService
-	_userRepository repository.UserRepository
-	_connectionPool *pgxpool.Pool
+	gRPCServerHandlers *grpc.ServerHandlers
+	userService        service.UserService
+	userRepository     repository.UserRepository
+	dbClient           db.Client
 }
 
-func newServiceProvider(connectionPool *pgxpool.Pool) serviceProvider {
-	return serviceProvider{_connectionPool: connectionPool}
+func newServiceProvider(dbClient db.Client) serviceProvider {
+	return serviceProvider{dbClient: dbClient}
 }
 
-func (s *serviceProvider) connectionPool() *pgxpool.Pool {
-	return s._connectionPool
+func (s *serviceProvider) getDBClient() db.Client {
+	return s.dbClient
 }
 
-func (s *serviceProvider) userRepository() repository.UserRepository {
-	if s._userRepository == nil {
-		s._userRepository = userRepository.NewRepository(
-			s.connectionPool(),
+func (s *serviceProvider) getUserRepository() repository.UserRepository {
+	if s.userRepository == nil {
+		s.userRepository = userRepository.NewRepository(
+			s.getDBClient(),
 		)
 	}
 
-	return s._userRepository
+	return s.userRepository
 }
 
-func (s *serviceProvider) userService() service.UserService {
-	if s._userService == nil {
-		s._userService = userService.NewService(
-			s.userRepository(),
+func (s *serviceProvider) getUserService() service.UserService {
+	if s.userService == nil {
+		s.userService = userService.NewService(
+			s.getUserRepository(),
 		)
 	}
 
-	return s._userService
+	return s.userService
 }
 
-func (s *serviceProvider) serverHandlers() *grpc.ServerHandlers {
-	if s._gRPCServer == nil {
-		s._gRPCServer = grpc.NewUserGRPCHandlers(
-			s.userService(),
+func (s *serviceProvider) getGRPCServerHandlers() *grpc.ServerHandlers {
+	if s.gRPCServerHandlers == nil {
+		s.gRPCServerHandlers = grpc.NewUserGRPCHandlers(
+			s.getUserService(),
 		)
 	}
 
-	return s._gRPCServer
+	return s.gRPCServerHandlers
 }

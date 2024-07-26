@@ -6,6 +6,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/brianvoe/gofakeit/v7 v7.0.4
 	github.com/caarlos0/env/v11 v11.1.0
+	github.com/georgysavva/scany/v2 v2.1.3
 	github.com/jackc/pgx/v5 v5.6.0
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
