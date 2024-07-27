@@ -53,7 +53,14 @@ generate-chat-api:
     	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc api/proto/chat-v1/chat.proto
 
 up:
-	docker-compose up --build --detach
+	make up-auth
+	make up-chat
+
+up-auth:
+	docker-compose up auth --build --detach
+
+up-chat:
+	docker compose up chat-server --build --detach
 
 stop:
 	docker-compose stop
@@ -63,7 +70,6 @@ down:
 
 migration-status:
 	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} status -v
-
 
 migration-up:
 	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} up -v
