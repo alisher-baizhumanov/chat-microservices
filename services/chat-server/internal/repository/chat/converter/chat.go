@@ -6,9 +6,9 @@ import (
 )
 
 // ChatCreateModelToData converts a model.ChatCreate to a data.ChatCreate.
-// model.ChatCreate does not contain data.ChatCreate ID
-func ChatCreateModelToData(chat model.ChatCreate) data.ChatCreate {
+func ChatCreateModelToData(chat model.Chat) data.ChatCreate {
 	return data.ChatCreate{
+		ID:        chat.ID,
 		Name:      chat.Name,
 		CreatedAt: chat.CreatedAt,
 	}

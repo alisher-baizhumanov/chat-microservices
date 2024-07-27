@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 // ChatSave represents a structure for saving chat information.
 type ChatSave struct {
@@ -8,8 +12,9 @@ type ChatSave struct {
 	UserIDList []int64
 }
 
-// ChatCreate represents a structure for creating a new chat.
-type ChatCreate struct {
+// Chat represents a structure for creating a new chat.
+type Chat struct {
+	ID        primitive.ObjectID
 	Name      string
 	CreatedAt time.Time
 }

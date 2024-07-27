@@ -10,7 +10,7 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/model"
 )
 
-func (r *repository) DeleteByID(ctx context.Context, id string) error {
+func (r *repository) DeleteChatByID(ctx context.Context, id string) error {
 	update := map[string]any{
 		"$set": map[string]any{
 			"deletedAt": time.Now(),
