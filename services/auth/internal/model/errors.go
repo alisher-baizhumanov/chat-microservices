@@ -23,4 +23,7 @@ var (
 
 	// ErrNotFound is used when a requested resource is not found.
 	ErrNotFound = errors.New("not found")
+
+	// ErrCache is used for general cache errors.
+	ErrCache = errors.New("cache error")
 )
