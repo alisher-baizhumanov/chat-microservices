@@ -20,7 +20,16 @@ func (c *cacheRedis) Set(ctx context.Context, key string, value any, ttl time.Du
 }
 
 func (c *cacheRedis) Get(ctx context.Context, key string, dest any) error {
-	return c.client.HGetAll(ctx, key).Scan(dest)
+	mapStringCmd := c.client.HGetAll(ctx, key)
+	if mapStringCmd.Err() != nil {
+		return mapStringCmd.Err()
+	}
+
+	if len(mapStringCmd.Val()) == 0 {
+		return redis.Nil
+	}
+
+	return mapStringCmd.Scan(dest)
 }
 
 func (c *cacheRedis) Delete(ctx context.Context, key string) error {
