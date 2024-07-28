@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
@@ -10,7 +11,7 @@ import (
 // RegisterUser registers a new user in the system with the given registration details.
 // It converts the UserRegister model to a UserCreate model, sets the default user role,
 // and assigns the current time as the creation time.
-func (s *Service) RegisterUser(ctx context.Context, userRegister *model.UserRegister) (id int64, err error) {
+func (s *Service) RegisterUser(ctx context.Context, userRegister *model.UserRegister) (int64, error) {
 	if userRegister == nil {
 		return 0, model.ErrCanNotBeNil
 	}
@@ -23,5 +24,26 @@ func (s *Service) RegisterUser(ctx context.Context, userRegister *model.UserRegi
 		CreatedAt:      time.Now(),
 	}
 
-	return s.userRepository.CreateUser(ctx, userCreate)
+	id, err := s.userRepository.CreateUser(ctx, userCreate)
+	if err != nil {
+		return 0, err
+	}
+
+	user := model.User{
+		ID:        id,
+		Name:      userCreate.Name,
+		Email:     userCreate.Email,
+		Role:      userCreate.Role,
+		CreatedAt: userCreate.CreatedAt,
+		UpdatedAt: userCreate.CreatedAt,
+	}
+
+	if err = s.userCache.Set(ctx, user); err != nil {
+		slog.ErrorContext(ctx, "not created user in cache",
+			slog.String("error", err.Error()),
+			slog.Int64("id", id),
+		)
+	}
+
+	return id, nil
 }
