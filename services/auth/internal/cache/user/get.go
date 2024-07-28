@@ -19,11 +19,16 @@ func (u *userCache) Get(ctx context.Context, id int64) (model.User, error) {
 	key := strconv.FormatInt(id, 10)
 	if err := u.cache.Get(ctx, key, &user); err != nil {
 		if errors.Is(err, redis.Nil) {
-			return model.User{}, fmt.Errorf("%w, id: %d", model.ErrNotFound, id)
+			return model.User{}, model.ErrNotFound
 		}
 
 		return model.User{}, fmt.Errorf("%w, message: %w", model.ErrCache, err)
 	}
 
-	return converter.UserCacheDataToModel(id, user), nil
+	userModel, err := converter.UserCacheDataToModel(id, user)
+	if err != nil {
+		return model.User{}, fmt.Errorf("%w, message: %w", model.ErrTimeConverting, err)
+	}
+
+	return userModel, nil
 }
