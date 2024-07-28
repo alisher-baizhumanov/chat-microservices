@@ -52,6 +52,8 @@ services:
     environment:
       - "GRPC_SERVER_PORT=55051"
       - "DB_DSN=${POSTGRES_DB_DSN}"
+      - "CACHE_DSN=${REDIS_DSN}"
+      - "CACHE_TTL=${REDIS_TTL}"
     restart: unless-stopped
     networks:
       - inter-service-network

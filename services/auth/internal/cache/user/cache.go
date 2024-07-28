@@ -12,6 +12,6 @@ type userCache struct {
 	ttl time.Duration
 }
 
-func New(cache cache.Cache, ttl time.Duration) cacheInterface.UserCache {
+func NewCache(cache cache.Cache, ttl time.Duration) cacheInterface.UserCache {
 	return &userCache{cache: cache, ttl: ttl}
 }
