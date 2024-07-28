@@ -110,7 +110,7 @@ func MakeContextTx(ctx context.Context, tx pgx.Tx) context.Context {
 func logQuery(ctx context.Context, q postgres.Query, args ...any) {
 	if slog.Default().Enabled(ctx, slog.LevelDebug) {
 		prettyQuery := prettier.Pretty(q.QueryRaw, prettier.PlaceholderDollar, args...)
-		
+
 		slog.DebugContext(
 			ctx,
 			"sql",

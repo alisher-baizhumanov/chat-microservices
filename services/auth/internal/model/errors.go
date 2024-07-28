@@ -27,6 +27,6 @@ var (
 	// ErrCache is used for general cache errors.
 	ErrCache = errors.New("cache error")
 
-	// ErrConverting is used for general time converting error.
+	// ErrTimeConverting is used for general time converting error.
 	ErrTimeConverting = errors.New("time convert error")
 )
