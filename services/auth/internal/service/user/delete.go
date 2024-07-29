@@ -6,7 +6,7 @@ import (
 )
 
 // DeleteByID removes a user from the system identified by their unique identifier.
-func (s *Service) DeleteByID(ctx context.Context, id int64) error {
+func (s *service) DeleteByID(ctx context.Context, id int64) error {
 	if err := s.userRepository.DeleteUser(ctx, id); err != nil {
 		return err
 	}

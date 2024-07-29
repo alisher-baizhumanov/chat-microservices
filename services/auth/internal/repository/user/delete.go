@@ -11,7 +11,7 @@ import (
 )
 
 // DeleteUser removes a user from the repository based on the provided user ID.
-func (r *Repository) DeleteUser(ctx context.Context, id int64) error {
+func (r *repository) DeleteUser(ctx context.Context, id int64) error {
 	if id < 1 {
 		return model.ErrInvalidID
 	}

@@ -15,9 +15,9 @@ import (
 )
 
 // GetUser retrieves a user from the repository based on the provided user ID.
-func (r *Repository) GetUser(ctx context.Context, id int64) (*model.User, error) {
+func (r *repository) GetUser(ctx context.Context, id int64) (model.User, error) {
 	if id < 1 {
-		return nil, model.ErrInvalidID
+		return model.User{}, model.ErrInvalidID
 	}
 
 	sql, args, err := sq.Select(columnName, columnEmail, columndRole, columnCreatedAt, columnUpdatedAt).
@@ -26,7 +26,7 @@ func (r *Repository) GetUser(ctx context.Context, id int64) (*model.User, error)
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("%w, message: %w", model.ErrInvalidSQLQuery, err)
+		return model.User{}, fmt.Errorf("%w, message: %w", model.ErrInvalidSQLQuery, err)
 	}
 
 	q := db.Query{
@@ -38,11 +38,11 @@ func (r *Repository) GetUser(ctx context.Context, id int64) (*model.User, error)
 
 	if err := r.client.DB().ScanOne(ctx, &user, q, args...); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, model.ErrNotFound
+			return model.User{}, model.ErrNotFound
 		}
 
-		return nil, fmt.Errorf("%w, message: %w, id: %d", model.ErrDatabase, err, id)
+		return model.User{}, fmt.Errorf("%w, message: %w, id: %d", model.ErrDatabase, err, id)
 	}
 
-	return converter.UserDataToModel(&user), nil
+	return converter.UserDataToModel(user), nil
 }

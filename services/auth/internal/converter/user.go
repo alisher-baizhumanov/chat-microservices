@@ -8,25 +8,17 @@ import (
 )
 
 // UserRegisterProtoToModel converts a UserRegister protobuf message to a model.UserRegister struct.
-func UserRegisterProtoToModel(user *desc.UserRegister) *model.UserRegister {
-	if user == nil {
-		return nil
-	}
-
-	return &model.UserRegister{
-		Name:            user.Name,
-		Email:           user.Email,
-		Password:        []byte(user.Password),
-		PasswordConfirm: []byte(user.PasswordConfirm),
+func UserRegisterProtoToModel(user *desc.UserRegister) model.UserRegister {
+	return model.UserRegister{
+		Name:            user.GetName(),
+		Email:           user.GetEmail(),
+		Password:        []byte(user.GetPassword()),
+		PasswordConfirm: []byte(user.GetPasswordConfirm()),
 	}
 }
 
 // UserModelToProto converts a model.User struct to a UserInfo protobuf message.
-func UserModelToProto(user *model.User) *desc.UserInfo {
-	if user == nil {
-		return nil
-	}
-
+func UserModelToProto(user model.User) *desc.UserInfo {
 	var role desc.Role
 
 	switch user.Role {
@@ -49,11 +41,7 @@ func UserModelToProto(user *model.User) *desc.UserInfo {
 }
 
 // UserOptionsProtoToModel converts a UserUpdate protobuf message to a model.UserUpdateOptions struct.
-func UserOptionsProtoToModel(options *desc.UserUpdate) *model.UserUpdateOptions {
-	if options == nil {
-		return nil
-	}
-
+func UserOptionsProtoToModel(options *desc.UserUpdate) model.UserUpdateOptions {
 	var (
 		role  model.Role
 		name  *string
@@ -65,17 +53,19 @@ func UserOptionsProtoToModel(options *desc.UserUpdate) *model.UserUpdateOptions 
 		role = model.UserRole
 	case desc.Role_ADMIN:
 		role = model.AdminRole
+	default:
+		role = model.NullRole
 	}
 
-	if options.Name != nil {
-		name = &options.Name.Value
+	if options.GetName() != nil {
+		name = &options.GetName().Value
 	}
 
-	if options.Email != nil {
-		email = &options.Email.Value
+	if options.GetEmail() != nil {
+		email = &options.GetEmail().Value
 	}
 
-	return &model.UserUpdateOptions{
+	return model.UserUpdateOptions{
 		Role:  &role,
 		Name:  name,
 		Email: email,

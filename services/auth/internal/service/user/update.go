@@ -9,11 +9,7 @@ import (
 
 // UpdateUserFields updates specific fields of an existing user identified by their unique identifier.
 // It delegates the update operation to the user repository and returns an error, if any.
-func (s *Service) UpdateUserFields(ctx context.Context, id int64, userUpdate *model.UserUpdateOptions) error {
-	if userUpdate == nil {
-		return model.ErrCanNotBeNil
-	}
-
+func (s *service) UpdateUserFields(ctx context.Context, id int64, userUpdate model.UserUpdateOptions) error {
 	if err := s.userRepository.UpdateUser(ctx, id, userUpdate); err != nil {
 		return err
 	}

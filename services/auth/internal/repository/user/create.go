@@ -2,11 +2,9 @@ package user
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/jackc/pgx/v5/pgconn"
 
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
@@ -14,11 +12,7 @@ import (
 )
 
 // CreateUser creates a new user in the repository with the provided user creation data.
-func (r *Repository) CreateUser(ctx context.Context, userConverted *model.UserCreate) (int64, error) {
-	if userConverted == nil {
-		return 0, model.ErrCanNotBeNil
-	}
-
+func (r *repository) CreateUser(ctx context.Context, userConverted model.UserCreate) (int64, error) {
 	user := converter.UserCreateModelToData(userConverted)
 
 	sql, args, err := sq.Insert(tableUser).
@@ -42,20 +36,4 @@ func (r *Repository) CreateUser(ctx context.Context, userConverted *model.UserCr
 	}
 
 	return id, nil
-}
-
-func convertUniqueDBErr(err error) error {
-	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) {
-		if pgErr.Code == postgresUniqueErrorCode {
-			switch pgErr.ConstraintName {
-			case constraintFieldUserName:
-				return fmt.Errorf("%w, message: %s", model.ErrNonUniqueUsername, pgErr.Message)
-			case constraintFieldEmail:
-				return fmt.Errorf("%w, message: %s", model.ErrNonUniqueEmail, pgErr.Message)
-			}
-		}
-	}
-
-	return fmt.Errorf("%w, message: %w", model.ErrDatabase, err)
 }

@@ -31,8 +31,6 @@ func ErrorModelToProto(err error) error {
 
 	case errors.Is(err, model.ErrDatabase):
 		return status.Error(codes.Internal, message)
-	case errors.Is(err, model.ErrCanNotBeNil):
-		return status.Error(codes.InvalidArgument, "pointer does not exist")
 	default:
 		return status.Errorf(codes.Internal, "unknown error; message=\"%s\"", message)
 	}

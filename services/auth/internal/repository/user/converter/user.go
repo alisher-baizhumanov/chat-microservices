@@ -6,12 +6,8 @@ import (
 )
 
 // UserCreateModelToData converts model.UserCreate to data.UserCreate.
-func UserCreateModelToData(user *model.UserCreate) *data.UserCreate {
-	if user == nil {
-		return nil
-	}
-
-	return &data.UserCreate{
+func UserCreateModelToData(user model.UserCreate) data.UserCreate {
+	return data.UserCreate{
 		Name:           user.Name,
 		Email:          user.Email,
 		Role:           int8(user.Role),
@@ -21,12 +17,8 @@ func UserCreateModelToData(user *model.UserCreate) *data.UserCreate {
 }
 
 // UserDataToModel converts data.User to model.User.
-func UserDataToModel(user *data.User) *model.User {
-	if user == nil {
-		return nil
-	}
-
-	return &model.User{
+func UserDataToModel(user data.User) model.User {
+	return model.User{
 		ID:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,
@@ -37,18 +29,14 @@ func UserDataToModel(user *data.User) *model.User {
 }
 
 // UserUpdateOptionModelToData converts model.UserUpdateOptions to data.UserUpdateOptions.
-func UserUpdateOptionModelToData(options *model.UserUpdateOptions) *data.UserUpdateOptions {
-	if options == nil {
-		return nil
-	}
-
+func UserUpdateOptionModelToData(options model.UserUpdateOptions) data.UserUpdateOptions {
 	var role *int8
 	if options.Role != nil && *options.Role != model.NullRole {
 		num := int8(*options.Role)
 		role = &num
 	}
 
-	return &data.UserUpdateOptions{
+	return data.UserUpdateOptions{
 		Role:  role,
 		Name:  options.Name,
 		Email: options.Email,
