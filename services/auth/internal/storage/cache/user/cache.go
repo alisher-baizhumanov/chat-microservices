@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/cache"
-	cacheInterface "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/cache"
+	cacheInterface "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
 )
 
 type userCache struct {

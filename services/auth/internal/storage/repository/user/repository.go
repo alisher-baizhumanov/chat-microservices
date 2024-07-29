@@ -8,7 +8,7 @@ import (
 
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
-	def "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository"
+	def "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository"
 )
 
 const (

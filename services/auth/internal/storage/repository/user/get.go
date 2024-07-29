@@ -10,8 +10,8 @@ import (
 
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/user/converter"
-	data "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/user/model"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/user/converter"
+	data "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/user/model"
 )
 
 // GetUser retrieves a user from the repository based on the provided user ID.

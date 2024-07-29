@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/cache/user/converter"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/user/converter"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 )
 

@@ -8,7 +8,7 @@ import (
 
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/user/converter"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/user/converter"
 )
 
 // CreateUser creates a new user in the repository with the provided user creation data.

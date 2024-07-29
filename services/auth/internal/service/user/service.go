@@ -1,8 +1,8 @@
 package user
 
 import (
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/cache"
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository"
 	def "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service"
 )
 

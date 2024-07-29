@@ -8,8 +8,8 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/cache/user/converter"
-	cacheData "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/cache/user/model"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/user/converter"
+	cacheData "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/user/model"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 )
 

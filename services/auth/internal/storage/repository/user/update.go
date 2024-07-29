@@ -9,8 +9,8 @@ import (
 
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/user/converter"
-	data "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/repository/user/model"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/user/converter"
+	data "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/user/model"
 )
 
 // UpdateUser updates a user's information in the repository based on the provided user ID and update options.

@@ -3,7 +3,7 @@ package converter
 import (
 	"time"
 
-	cacheData "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/cache/user/model"
+	cacheData "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/user/model"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 )
 
