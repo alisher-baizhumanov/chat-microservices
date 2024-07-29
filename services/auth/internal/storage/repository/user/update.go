@@ -14,14 +14,14 @@ import (
 )
 
 // UpdateUser updates a user's information in the repository based on the provided user ID and update options.
-func (r *repository) UpdateUser(ctx context.Context, id int64, optionsConverted model.UserUpdateOptions) error {
+func (r *repository) UpdateUser(ctx context.Context, id int64, optionsConverted model.UserUpdateOptions, updatedAt time.Time) error {
 	if id < 1 {
 		return model.ErrInvalidID
 	}
 
 	options := converter.UserUpdateOptionModelToData(optionsConverted)
 
-	sql, args, err := buildSQLQuery(&options, id)
+	sql, args, err := buildSQLQuery(&options, id, updatedAt)
 	if err != nil {
 		return fmt.Errorf("%w, message: %w", model.ErrInvalidSQLQuery, err)
 	}
@@ -43,10 +43,10 @@ func (r *repository) UpdateUser(ctx context.Context, id int64, optionsConverted 
 	return nil
 }
 
-func buildSQLQuery(options *data.UserUpdateOptions, id int64) (sql string, args []any, err error) {
+func buildSQLQuery(options *data.UserUpdateOptions, id int64, updatedAt time.Time) (sql string, args []any, err error) {
 	builder := sq.Update(tableUser).
 		PlaceholderFormat(sq.Dollar).
-		Set(columnUpdatedAt, time.Now())
+		Set(columnUpdatedAt, updatedAt)
 
 	if options.Name != nil {
 		builder = builder.Set(columnName, *options.Name)

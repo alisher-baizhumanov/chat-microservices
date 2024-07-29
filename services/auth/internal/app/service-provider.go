@@ -5,13 +5,14 @@ import (
 
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/cache"
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
+	clock "github.com/alisher-baizhumanov/chat-microservices/pkg/clock"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service"
+	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
 	cacheInterface "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
 	userCache "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/user"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository"
 	userRepository "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/user"
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service"
-	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
 )
 
 type serviceProvider struct {
@@ -70,6 +71,7 @@ func (s *serviceProvider) getUserService() service.UserService {
 		s.userService = userService.NewService(
 			s.getUserRepository(),
 			s.getUserCache(),
+			&clock.RealClock{},
 		)
 	}
 
