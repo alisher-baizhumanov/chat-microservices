@@ -20,12 +20,12 @@ func ErrorModelToProto(err error) error {
 	switch {
 	case errors.Is(err, model.ErrInvalidID):
 		return status.Error(codes.InvalidArgument, message)
-	case errors.Is(err, model.ErrCanNotBeNil):
-		return status.Error(codes.InvalidArgument, "pointer does not exist")
 
 	case errors.Is(err, model.ErrNotFound):
 		return status.Error(codes.NotFound, "")
 
+	case errors.Is(err, model.ErrGeneratingID):
+		return status.Error(codes.Internal, message)
 	case errors.Is(err, model.ErrDatabase):
 		return status.Error(codes.Internal, message)
 	default:

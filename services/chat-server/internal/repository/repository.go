@@ -13,6 +13,7 @@ type MessageRepository interface {
 
 // ChatRepository defines the interface for chat storage operations.
 type ChatRepository interface {
-	Create(ctx context.Context, chat model.ChatCreate, userIDList []int64) (string, error)
-	DeleteByID(ctx context.Context, id string) error
+	CreateChat(ctx context.Context, chat model.Chat) error
+	JoinParticipants(ctx context.Context, participants []model.Participant) error
+	DeleteChatByID(ctx context.Context, id string) error
 }

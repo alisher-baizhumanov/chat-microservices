@@ -4,27 +4,35 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo"
+	mg "github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo/mg"
 	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
 	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/chat-v1"
-
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/config"
 )
 
 // App represents the application with its services and gRPC server.
 type App struct {
-	cfg         *config.Config
-	server      *grpc.Server
-	mongoClient any
+	cfg    *config.Config
+	server *grpc.Server
+	client mongo.Client
 }
 
 // NewApp creates and initializes a new App instance.
-func NewApp(_ context.Context, cfg *config.Config) (*App, error) {
-	var mongoClient any
+func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
+	client, err := mg.NewClient(ctx, cfg.DSN, cfg.Database)
+	if err != nil {
+		return nil, err
+	}
 
-	services := newServiceProvider(mongoClient)
+	if err = client.Ping(ctx); err != nil {
+		return nil, err
+	}
 
-	gRPCHandlers := services.ServerHandlers()
+	services := newServiceProvider(client)
+
+	gRPCHandlers := services.getServerHandlers()
 
 	server, err := grpc.NewGRPCServer(cfg.GRPCServerPort, &desc.ChatServiceV1_ServiceDesc, gRPCHandlers)
 	if err != nil {
@@ -32,14 +40,22 @@ func NewApp(_ context.Context, cfg *config.Config) (*App, error) {
 	}
 
 	return &App{
-		cfg:         cfg,
-		server:      server,
-		mongoClient: mongoClient,
+		cfg:    cfg,
+		server: server,
+		client: client,
 	}, nil
 }
 
 // Run starts the gRPC server and waits for a termination signal to gracefully shut down the server.
-func (a *App) Run() error {
+func (a *App) Run(ctx context.Context) {
+	defer func() {
+		if err := a.client.Close(ctx); err != nil {
+			slog.Warn("error to close connection to DB",
+				slog.Any("error", err),
+			)
+		}
+	}()
+
 	a.server.Start()
 	defer a.server.Stop()
 	slog.Info("Starting gRPC Server",
@@ -48,6 +64,4 @@ func (a *App) Run() error {
 
 	stop := gracefulshutdown.WaitSignal()
 	slog.Info("Stop application", slog.String("signal", stop.String()))
-
-	return nil
 }

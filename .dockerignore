@@ -3,3 +3,6 @@ bin
 .idea
 .golangci.pipeline.yaml
 .gitignore
+docker-compose.yml
+Makefile
+README.md

@@ -1,6 +1,10 @@
 package config
 
-import "github.com/caarlos0/env/v11"
+import (
+	"log/slog"
+
+	"github.com/caarlos0/env/v11"
+)
 
 // Config holds configuration settings for the application.
 type Config struct {
@@ -10,6 +14,8 @@ type Config struct {
 
 // Load attempts to load the application configuration.
 func Load() (*Config, error) {
+	slog.SetLogLoggerLevel(slog.LevelDebug)
+
 	cfg := &Config{}
 
 	if err := env.Parse(cfg); err != nil {
