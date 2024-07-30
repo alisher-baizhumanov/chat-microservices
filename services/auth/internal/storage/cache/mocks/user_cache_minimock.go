@@ -2,7 +2,7 @@
 
 package mocks
 
-//go:generate minimock -i github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/cache.UserCache -o user_cache_minimock.go -n UserCacheMock -p mocks
+//go:generate minimock -i github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache.UserCache -o user_cache_minimock.go -n UserCacheMock -p mocks
 
 import (
 	"context"
