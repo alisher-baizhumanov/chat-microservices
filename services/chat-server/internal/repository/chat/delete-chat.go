@@ -10,6 +10,9 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/model"
 )
 
+// DeleteChatByID marks a chat document as deleted by setting a timestamp in the "deletedAt" field.
+// This function updates the chat document identified by the given ID with the current time,
+// marking it as deleted. The actual document is not removed from the database.
 func (r *repository) DeleteChatByID(ctx context.Context, id string) error {
 	update := map[string]any{
 		"$set": map[string]any{
@@ -23,7 +26,6 @@ func (r *repository) DeleteChatByID(ctx context.Context, id string) error {
 		}
 
 		return fmt.Errorf("%w, message: %w", model.ErrDatabase, err)
-
 	}
 
 	return nil

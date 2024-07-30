@@ -8,6 +8,7 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository/message/converter"
 )
 
+// CreateMessage inserts a new message document into the database.
 func (r *repository) CreateMessage(ctx context.Context, messageConverted model.MessageCreate) error {
 	message, err := converter.MessageCreateModelToData(messageConverted)
 	if err != nil {
