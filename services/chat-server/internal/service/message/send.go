@@ -10,6 +10,7 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/model"
 )
 
+// Send creates and saves a new message, generating a unique ID for it.
 func (s *service) Send(ctx context.Context, messageSave model.MessageSave) (string, error) {
 	id, err := uuid.NewRandom()
 	if err != nil {

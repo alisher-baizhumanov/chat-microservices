@@ -8,6 +8,7 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository/chat/converter"
 )
 
+// CreateChat creates a new chat document in the database.
 func (r *repository) CreateChat(ctx context.Context, chatConverted model.Chat) error {
 	chat := converter.ChatCreateModelToData(chatConverted)
 
