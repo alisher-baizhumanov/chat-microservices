@@ -6,7 +6,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/chat-v1"
-	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/converter"
+	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/api/grpc/converter"
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/service"
 )
 
