@@ -4,7 +4,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/model"
-	data "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository/message/model"
+	data "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/storage/repository/message/model"
 )
 
 // MessageCreateModelToData converts a model.MessageCreate to a data.MessageCreate.

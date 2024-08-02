@@ -2,7 +2,7 @@ package chat
 
 import (
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo"
-	repositoryInterface "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository"
+	repositoryInterface "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/storage/repository"
 )
 
 const (

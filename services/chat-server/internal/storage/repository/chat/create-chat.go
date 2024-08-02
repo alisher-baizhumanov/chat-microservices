@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/model"
-	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository/chat/converter"
+	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/storage/repository/chat/converter"
 )
 
 func (r *repository) CreateChat(ctx context.Context, chatConverted model.Chat) error {

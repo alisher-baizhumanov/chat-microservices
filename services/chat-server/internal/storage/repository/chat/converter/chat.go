@@ -2,7 +2,7 @@ package converter
 
 import (
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/model"
-	data "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository/chat/model"
+	data "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/storage/repository/chat/model"
 )
 
 // ChatCreateModelToData converts a model.ChatCreate to a data.ChatCreate.
