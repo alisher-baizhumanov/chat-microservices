@@ -14,8 +14,8 @@ type service struct {
 	clock          clockInterface.Clock
 }
 
-// NewService creates a new Service instance with the given user repository.
+// New creates a new Service instance with the given user repository.
 // It returns a pointer to the newly created Service.
-func NewService(userRepository repository.UserRepository, userCache cache.UserCache, clock clockInterface.Clock) def.UserService {
+func New(userRepository repository.UserRepository, userCache cache.UserCache, clock clockInterface.Clock) def.UserService {
 	return &service{userRepository: userRepository, userCache: userCache, clock: clock}
 }

@@ -68,7 +68,7 @@ func (s *serviceProvider) getUserCache() cacheInterface.UserCache {
 
 func (s *serviceProvider) getUserService() service.UserService {
 	if s.userService == nil {
-		s.userService = userService.NewService(
+		s.userService = userService.New(
 			s.getUserRepository(),
 			s.getUserCache(),
 			&clock.RealClock{},
