@@ -33,8 +33,6 @@ func NewDB(dbc *pgxpool.Pool) postgres.DB {
 
 // ScanOne executes a query and scans the result into the provided destination.
 func (p *pg) ScanOne(ctx context.Context, dest any, q postgres.Query, args ...any) error {
-	logQuery(ctx, q, args...)
-
 	row, err := p.Query(ctx, q, args...)
 	if err != nil {
 		return err
@@ -45,8 +43,6 @@ func (p *pg) ScanOne(ctx context.Context, dest any, q postgres.Query, args ...an
 
 // ScanAll executes a query and scans all the results into the provided destination.
 func (p *pg) ScanAll(ctx context.Context, dest any, q postgres.Query, args ...any) error {
-	logQuery(ctx, q, args...)
-
 	rows, err := p.Query(ctx, q, args...)
 	if err != nil {
 		return err
@@ -114,6 +110,7 @@ func MakeContextTx(ctx context.Context, tx pgx.Tx) context.Context {
 func logQuery(ctx context.Context, q postgres.Query, args ...any) {
 	if slog.Default().Enabled(ctx, slog.LevelDebug) {
 		prettyQuery := prettier.Pretty(q.QueryRaw, prettier.PlaceholderDollar, args...)
+
 		slog.DebugContext(
 			ctx,
 			"sql",

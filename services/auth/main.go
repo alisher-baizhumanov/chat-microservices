@@ -27,7 +27,5 @@ func run() error {
 		return err
 	}
 
-	application.Run()
-
-	return nil
+	return application.Run(ctx)
 }

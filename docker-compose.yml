@@ -27,10 +27,23 @@ services:
     networks:
       - inter-service-network
 
+  redis:
+    container_name: chat-microservices-redis
+    image: redis:7.2.5-alpine3.20
+    ports:
+      - "55014:6379"
+    restart: always
+    volumes:
+      - redis-volume:/data
+    networks:
+      - inter-service-network
+
   auth:
     container_name: chat-microservices-auth
     depends_on:
       - postgres
+      - redis
+      - migrator
     build:
       context: .
       dockerfile: services/auth/Dockerfile
@@ -39,6 +52,8 @@ services:
     environment:
       - "GRPC_SERVER_PORT=55051"
       - "DB_DSN=${POSTGRES_DB_DSN}"
+      - "CACHE_DSN=${REDIS_DSN}"
+      - "CACHE_TTL=${REDIS_TTL}"
     restart: unless-stopped
     networks:
       - inter-service-network
@@ -77,6 +92,8 @@ services:
 
 volumes:
   postgres-volume:
+    driver: local
+  redis-volume:
     driver: local
   mongo-volume:
     driver: local
