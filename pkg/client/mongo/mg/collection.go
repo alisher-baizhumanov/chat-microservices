@@ -20,6 +20,7 @@ type mongoCollection struct {
 	collection *mongoLibrary.Collection
 }
 
+// InsertOne inserts a single document into the collection.
 func (m *mongoCollection) InsertOne(ctx context.Context, queryName string, document any) (string, error) {
 	logQuery(ctx, queryName, document)
 
@@ -36,6 +37,7 @@ func (m *mongoCollection) InsertOne(ctx context.Context, queryName string, docum
 	return fmt.Sprintf("%v", id.InsertedID), nil
 }
 
+// InsertMany inserts multiple documents into the collection.
 func (m *mongoCollection) InsertMany(ctx context.Context, queryName string, documents []any) error {
 	logQuery(ctx, queryName, documents)
 
@@ -43,6 +45,7 @@ func (m *mongoCollection) InsertMany(ctx context.Context, queryName string, docu
 	return err
 }
 
+// UpdateByID updates a document in the collection by its ID.
 func (m *mongoCollection) UpdateByID(ctx context.Context, queryName string, id string, update map[string]any) error {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {

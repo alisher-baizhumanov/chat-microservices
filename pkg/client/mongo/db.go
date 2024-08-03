@@ -11,7 +11,7 @@ type Client interface {
 	Ping(ctx context.Context) error
 }
 
-// Collection - an interface for interacting with a collecion.
+// Collection - an interface for interacting with a collection.
 type Collection interface {
 	InsertOne(ctx context.Context, queryName string, document any) (string, error)
 	InsertMany(ctx context.Context, queryName string, documents []any) error
