@@ -73,7 +73,7 @@ func TestUpdate(t *testing.T) {
 				return mock
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
-				mock := cacheMocks.NewUserCacheMock(t)
+				mock := cacheMocks.NewUserCacheMock(mc)
 				mock.DeleteMock.Expect(ctx, id).Return(nil)
 
 				return mock

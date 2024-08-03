@@ -13,7 +13,7 @@ import (
 // ServerHandlers implements the gRPC server for user-related operations.
 type ServerHandlers struct {
 	desc.UnimplementedUserServiceV1Server
-	
+
 	userService service.UserService
 }
 

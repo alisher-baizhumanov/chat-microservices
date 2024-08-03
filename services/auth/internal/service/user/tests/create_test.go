@@ -90,7 +90,7 @@ func TestRegister(t *testing.T) {
 				return mock
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
-				mock := cacheMocks.NewUserCacheMock(t)
+				mock := cacheMocks.NewUserCacheMock(mc)
 				mock.SetMock.Expect(ctx, userCache).Return(nil)
 
 				return mock

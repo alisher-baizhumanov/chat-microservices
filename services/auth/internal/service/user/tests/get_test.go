@@ -76,7 +76,7 @@ func TestGet(t *testing.T) {
 				return mock
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
-				mock := cacheMocks.NewUserCacheMock(t)
+				mock := cacheMocks.NewUserCacheMock(mc)
 				mock.GetMock.Expect(ctx, id).Return(model.User{}, err)
 				mock.SetMock.Expect(ctx, userFromStorage).Return(nil)
 
