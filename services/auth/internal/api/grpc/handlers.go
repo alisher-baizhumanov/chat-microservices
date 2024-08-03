@@ -6,13 +6,14 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1"
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/converter"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc/converter"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service"
 )
 
 // ServerHandlers implements the gRPC server for user-related operations.
 type ServerHandlers struct {
 	desc.UnimplementedUserServiceV1Server
+
 	userService service.UserService
 }
 

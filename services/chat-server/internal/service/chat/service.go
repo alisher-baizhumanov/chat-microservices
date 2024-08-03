@@ -1,8 +1,8 @@
 package chat
 
 import (
-	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository"
 	serviceInterface "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/service"
+	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/storage/repository"
 )
 
 type service struct {

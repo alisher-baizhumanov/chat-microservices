@@ -9,10 +9,10 @@ import (
 )
 
 // GetByID retrieves a user by their unique identifier by delegating the call to the user repository.
-func (s *Service) GetByID(ctx context.Context, id int64) (*model.User, error) {
+func (s *service) GetByID(ctx context.Context, id int64) (model.User, error) {
 	user, err := s.userCache.Get(ctx, id)
 	if err == nil {
-		return &user, nil
+		return user, nil
 	}
 
 	if !errors.Is(err, model.ErrNotFound) {
@@ -24,10 +24,10 @@ func (s *Service) GetByID(ctx context.Context, id int64) (*model.User, error) {
 
 	userDB, err := s.userRepository.GetUser(ctx, id)
 	if err != nil {
-		return nil, err
+		return model.User{}, err
 	}
 
-	if err = s.userCache.Set(ctx, *userDB); err != nil {
+	if err = s.userCache.Set(ctx, userDB); err != nil {
 		slog.ErrorContext(ctx, "not created user in cache",
 			slog.String("error", err.Error()),
 			slog.Int64("id", id),
