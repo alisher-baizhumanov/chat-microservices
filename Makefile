@@ -12,9 +12,7 @@ install:
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.14.0
 	GOBIN=$(LOCAL_BIN) go install github.com/gojuno/minimock/v3/cmd/minimock@v3.3.10
-	GOBIN=$(LOCAL_BIN) go install \
-		github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.21.0 \
-		github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.21.0
+	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.20.0
 
 prepare:
 	make tidy
@@ -46,18 +44,34 @@ generate:
 generate-user-api:
 	mkdir -p protos/generated/user-v1
 	protoc --proto_path api/proto/user-v1 \
+		--proto_path=vendor.protogen \
     	--go_out=protos/generated/user-v1 --go_opt=paths=source_relative \
     	--plugin=protoc-gen-go=bin/protoc-gen-go \
     	--go-grpc_out=protos/generated/user-v1 --go-grpc_opt=paths=source_relative \
-    	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc api/proto/user-v1/user.proto
+    	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
+		--grpc-gateway_out=protos/generated/user-v1 --grpc-gateway_opt=paths=source_relative \
+		--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
+		api/proto/user-v1/user.proto
 
 generate-chat-api:
 	mkdir -p protos/generated/chat-v1
 	protoc --proto_path api/proto/chat-v1 \
+		--proto_path=vendor.protogen \
     	--go_out=protos/generated/chat-v1 --go_opt=paths=source_relative \
     	--plugin=protoc-gen-go=bin/protoc-gen-go \
     	--go-grpc_out=protos/generated/chat-v1 --go-grpc_opt=paths=source_relative \
-    	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc api/proto/chat-v1/chat.proto
+    	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
+		--grpc-gateway_out=protos/generated/chat-v1 --grpc-gateway_opt=paths=source_relative \
+		--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
+		api/proto/chat-v1/chat.proto
+
+vendor-proto:
+		@if [ ! -d vendor.protogen/google ]; then \
+			git clone https://github.com/googleapis/googleapis vendor.protogen/googleapis &&\
+			mkdir -p  vendor.protogen/google/ &&\
+			mv vendor.protogen/googleapis/google/api vendor.protogen/google &&\
+			rm -rf vendor.protogen/googleapis ;\
+		fi
 
 up:
 	make up-auth

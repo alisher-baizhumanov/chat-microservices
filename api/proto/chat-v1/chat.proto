@@ -1,15 +1,30 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 
 package chat_v1;
 
 option go_package = "github.com/alisher-baizhumanov/chat-microservices/protos/generated/chat-v1;chat_v1";
 
 service ChatServiceV1 {
-  rpc CreateChat(CreateChatIn) returns (CreateChatOut) {}
-  rpc DeleteChat(DeleteChatIn) returns (google.protobuf.Empty) {}
-  rpc SendMessage(SendMessageIn) returns (SendMessageOut) {}
+  rpc CreateChat(CreateChatIn) returns (CreateChatOut) {
+    option (google.api.http) = {
+      post: "/v1/chats"
+      body: "*"
+    };
+  }
+  rpc DeleteChat(DeleteChatIn) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/chats/{id}"
+    };
+  }
+  rpc SendMessage(SendMessageIn) returns (SendMessageOut) {
+    option (google.api.http) = {
+      post: "/v1/messages"
+      body: "*"
+    };
+  }
 }
 
 message CreateChatIn {
