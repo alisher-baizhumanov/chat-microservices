@@ -5,9 +5,9 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 
-	httpLibrary "github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
+	httpLibrary "github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
 	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/chat-v1"
 	grpcHandler "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/api/grpc"
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/config"
@@ -116,7 +116,7 @@ func (s *serviceProvider) getHTTPserver(ctx context.Context) (*httpLibrary.Serve
 	); err != nil {
 		return nil, err
 	}
-	
+
 	return httpLibrary.NewHTTPServer(
 		s.getConfig().HTTPServerPort,
 		mux,

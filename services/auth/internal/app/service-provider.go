@@ -113,7 +113,7 @@ func (s *serviceProvider) getHTTPserver(ctx context.Context) (*httpLibrary.Serve
 	); err != nil {
 		return nil, err
 	}
-	
+
 	return httpLibrary.NewHTTPServer(
 		s.getConfig().HTTPServerPort,
 		mux,
