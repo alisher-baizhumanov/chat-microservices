@@ -13,6 +13,8 @@ install:
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.14.0
 	GOBIN=$(LOCAL_BIN) go install github.com/gojuno/minimock/v3/cmd/minimock@v3.3.10
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.20.0
+	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.20.0
+	GOBIN=$(LOCAL_BIN) go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
 
 prepare:
 	make tidy
@@ -49,6 +51,8 @@ generate-user-api:
     	--plugin=protoc-gen-go=bin/protoc-gen-go \
     	--go-grpc_out=protos/generated/user-v1 --go-grpc_opt=paths=source_relative \
     	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
+		--validate_out lang=go:protos/generated/user-v1 --validate_opt=paths=source_relative \
+		--plugin=protoc-gen-validate=bin/protoc-gen-validate \
 		--grpc-gateway_out=protos/generated/user-v1 --grpc-gateway_opt=paths=source_relative \
 		--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
 		api/proto/user-v1/user.proto
@@ -61,6 +65,8 @@ generate-chat-api:
     	--plugin=protoc-gen-go=bin/protoc-gen-go \
     	--go-grpc_out=protos/generated/chat-v1 --go-grpc_opt=paths=source_relative \
     	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
+		--validate_out lang=go:protos/generated/chat-v1 --validate_opt=paths=source_relative \
+		--plugin=protoc-gen-validate=bin/protoc-gen-validate \
 		--grpc-gateway_out=protos/generated/chat-v1 --grpc-gateway_opt=paths=source_relative \
 		--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
 		api/proto/chat-v1/chat.proto
@@ -71,6 +77,12 @@ vendor-proto:
 			mkdir -p  vendor.protogen/google/ &&\
 			mv vendor.protogen/googleapis/google/api vendor.protogen/google &&\
 			rm -rf vendor.protogen/googleapis ;\
+		fi
+		@if [ ! -d vendor.protogen/validate ]; then \
+			mkdir -p vendor.protogen/validate &&\
+			git clone https://github.com/envoyproxy/protoc-gen-validate vendor.protogen/protoc-gen-validate &&\
+			mv vendor.protogen/protoc-gen-validate/validate/*.proto vendor.protogen/validate &&\
+			rm -rf vendor.protogen/protoc-gen-validate ;\
 		fi
 
 up:
