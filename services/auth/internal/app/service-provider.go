@@ -1,12 +1,18 @@
 package app
 
 import (
-	"time"
+	"context"
+
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/cache"
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
 	clock "github.com/alisher-baizhumanov/chat-microservices/pkg/clock"
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"
+	grpcLibrary "github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
+	httpLibrary "github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
+	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1"
+	grpcHandler "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/config"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
 	cacheInterface "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
@@ -16,21 +22,25 @@ import (
 )
 
 type serviceProvider struct {
-	gRPCServerHandlers *grpc.ServerHandlers
-	userService        service.UserService
-	userRepository     repository.UserRepository
-	dbClient           db.Client
-	cacheClient        cache.Client
-	userCache          cacheInterface.UserCache
-	ttl                time.Duration
+	gRPCHandlers   *grpcHandler.ServerHandlers
+	userService    service.UserService
+	userRepository repository.UserRepository
+	dbClient       db.Client
+	cacheClient    cache.Client
+	userCache      cacheInterface.UserCache
+	cfg            *config.Config
 }
 
-func newServiceProvider(dbClient db.Client, cacheClient cache.Client, ttl time.Duration) serviceProvider {
+func newServiceProvider(dbClient db.Client, cacheClient cache.Client, cfg *config.Config) serviceProvider {
 	return serviceProvider{
 		dbClient:    dbClient,
 		cacheClient: cacheClient,
-		ttl:         ttl,
+		cfg:         cfg,
 	}
+}
+
+func (s *serviceProvider) getConfig() *config.Config {
+	return s.cfg
 }
 
 func (s *serviceProvider) getDBClient() db.Client {
@@ -39,10 +49,6 @@ func (s *serviceProvider) getDBClient() db.Client {
 
 func (s *serviceProvider) getCacheClient() cache.Client {
 	return s.cacheClient
-}
-
-func (s *serviceProvider) getTTL() time.Duration {
-	return s.ttl
 }
 
 func (s *serviceProvider) getUserRepository() repository.UserRepository {
@@ -59,7 +65,7 @@ func (s *serviceProvider) getUserCache() cacheInterface.UserCache {
 	if s.userCache == nil {
 		s.userCache = userCache.NewCache(
 			s.getCacheClient().Cache(),
-			s.getTTL(),
+			s.getConfig().CacheTTL,
 		)
 	}
 
@@ -78,12 +84,38 @@ func (s *serviceProvider) getUserService() service.UserService {
 	return s.userService
 }
 
-func (s *serviceProvider) getGRPCServerHandlers() *grpc.ServerHandlers {
-	if s.gRPCServerHandlers == nil {
-		s.gRPCServerHandlers = grpc.NewUserGRPCHandlers(
+func (s *serviceProvider) getGRPCHandlers() *grpcHandler.ServerHandlers {
+	if s.gRPCHandlers == nil {
+		s.gRPCHandlers = grpcHandler.NewUserGRPCHandlers(
 			s.getUserService(),
 		)
 	}
 
-	return s.gRPCServerHandlers
+	return s.gRPCHandlers
+}
+
+func (s *serviceProvider) getGRPCServer() (*grpcLibrary.Server, error) {
+	return grpcLibrary.NewGRPCServer(
+		s.getConfig().GRPCServerPort,
+		&desc.UserServiceV1_ServiceDesc,
+		s.getGRPCHandlers(),
+	)
+}
+
+func (s *serviceProvider) getHTTPserver(ctx context.Context) (*httpLibrary.Server, error) {
+	mux := runtime.NewServeMux()
+
+	if err := desc.RegisterUserServiceV1HandlerFromEndpoint(
+		ctx,
+		mux,
+		s.getConfig().GRPCAddress(),
+		s.getConfig().GRPCDialOptions(),
+	); err != nil {
+		return nil, err
+	}
+	
+	return httpLibrary.NewHTTPServer(
+		s.getConfig().HTTPServerPort,
+		mux,
+	), nil
 }

@@ -12,24 +12,24 @@ option go_package = "github.com/alisher-baizhumanov/chat-microservices/protos/ge
 service UserServiceV1 {
     rpc Create(CreateIn) returns (CreateOut) {
         option (google.api.http) = {
-            post: "/v1/users"
-            body: "*"
+            post: "/auth/v1/users"
+            body: "user_register"
         };
     }
     rpc Get(GetIn) returns (GetOut) {
         option (google.api.http) = {
-            get: "/v1/users/{id}"
+            get: "/auth/v1/users/{id}"
         };
     }
     rpc Update(UpdateIn) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            patch: "/v1/users/{id}"
+            patch: "/auth/v1/users/{id}"
             body: "user_update"
         };
     }
     rpc Delete(DeleteIn) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/v1/users/{id}"
+            delete: "/auth/v1/users/{id}"
         };
     }
 }

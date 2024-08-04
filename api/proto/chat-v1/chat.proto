@@ -10,19 +10,19 @@ option go_package = "github.com/alisher-baizhumanov/chat-microservices/protos/ge
 service ChatServiceV1 {
   rpc CreateChat(CreateChatIn) returns (CreateChatOut) {
     option (google.api.http) = {
-      post: "/v1/chats"
-      body: "*"
+      post: "/chat-server/v1/chats"
+      body: "chat"
     };
   }
   rpc DeleteChat(DeleteChatIn) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/v1/chats/{id}"
+      delete: "/chat-server/v1/chats/{id}"
     };
   }
   rpc SendMessage(SendMessageIn) returns (SendMessageOut) {
     option (google.api.http) = {
-      post: "/v1/messages"
-      body: "*"
+      post: "/chat-server/v1/messages"
+      body: "message"
     };
   }
 }
