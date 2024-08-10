@@ -39,7 +39,7 @@ func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
 		return nil, err
 	}
 
-	httpServer, err := services.getHTTPserver(ctx)
+	httpServer, err := services.getHTTPServer(ctx)
 	if err != nil {
 		return nil, err
 	}

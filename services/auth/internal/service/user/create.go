@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 )
@@ -11,7 +12,7 @@ import (
 // It converts the UserRegister model to a UserCreate model, sets the default user role,
 // and assigns the current time as the creation time.
 func (s *service) RegisterUser(ctx context.Context, userRegister model.UserRegister) (int64, error) {
-	createdAt := s.clock.Now()
+	createdAt := time.Now()
 
 	userCreate := model.UserCreate{
 		Name:           userRegister.Name,

@@ -1,17 +1,14 @@
 package user_test
 
 import (
-	"context"
 	"testing"
-	"time"
 
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/require"
 
-	"github.com/alisher-baizhumanov/chat-microservices/pkg/clock"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
-	cache "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
 	cacheMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/mocks"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository"
 	repositoryMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/mocks"
@@ -20,99 +17,123 @@ import (
 func TestRegister(t *testing.T) {
 	t.Parallel()
 
-	type input struct {
-		ctx  context.Context
-		user model.UserRegister
-	}
+	mc := minimock.NewController(t)
 
-	type output struct {
-		id  int64
-		err error
-	}
-
-	var (
-		ctx = context.Background()
-		mc  = minimock.NewController(t)
-
-		name      = "name"
-		email     = "example@gmail.com"
-		role      = model.UserRole
-		password  = []byte("secret_password")
-		createdAt = time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
-
-		userRegister = model.UserRegister{
-			Name:            "name",
-			Email:           email,
-			Password:        password,
-			PasswordConfirm: password,
-		}
-
-		userDB = model.UserCreate{
-			Name:           name,
-			Email:          email,
-			Role:           role,
-			CreatedAt:      createdAt,
-			HashedPassword: password,
-		}
-
-		userCache = model.User{
-			ID:        1,
-			Name:      name,
-			Email:     email,
-			Role:      role,
-			CreatedAt: createdAt,
-			UpdatedAt: createdAt,
-		}
-	)
-
-	tests := []struct {
+	cases := []struct {
 		name               string
-		input              input
-		output             output
+		mc                 *minimock.Controller
+		userRegister       model.UserRegister
+		expID              int64
+		expErr             error
 		userRepositoryMock func(mc *minimock.Controller) repository.UserRepository
 		userCacheMock      func(mc *minimock.Controller) cache.UserCache
-		clock              clock.Clock
 	}{
 		{
-			name: "success case create user",
-			input: input{
-				ctx:  ctx,
-				user: userRegister,
+			name:         "success case create user",
+			userRegister: userRegister,
+			expID:        1,
+			expErr:       nil,
+			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
+				return createUserRepositoryCreateMock(mc, t)
 			},
-			output: output{
-				id:  1,
-				err: nil,
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				return createUserCacheMock(mc, t)
 			},
+		},
+		{
+			name: "error case user already exists",
+			userRegister: model.UserRegister{
+				Name:            name,
+				Email:           email,
+				Password:        password,
+				PasswordConfirm: password,
+			},
+			expID:  0,
+			expErr: model.ErrNonUniqueUsername,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				mock := repositoryMocks.NewUserRepositoryMock(mc)
-				mock.CreateUserMock.Expect(ctx, userDB).Return(1, nil)
+				mock.CreateUserMock.Return(0, model.ErrNonUniqueUsername)
+				return mock
+			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				return cacheMocks.NewUserCacheMock(mc)
+			},
+		},
+		{
+			name: "error case email already exists",
+			userRegister: model.UserRegister{
+				Name:            name,
+				Email:           "email",
+				Password:        password,
+				PasswordConfirm: password,
+			},
+			expID:  0,
+			expErr: model.ErrNonUniqueEmail,
+			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
+				mock := repositoryMocks.NewUserRepositoryMock(mc)
+				mock.CreateUserMock.Return(0, model.ErrNonUniqueEmail)
 
 				return mock
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				return cacheMocks.NewUserCacheMock(mc)
+			},
+		},
+		{
+			name: "error case repository error",
+			userRegister: model.UserRegister{
+				Name:            name,
+				Email:           email,
+				Password:        password,
+				PasswordConfirm: password,
+			},
+			expID:  0,
+			expErr: model.ErrDatabase,
+			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
+				mock := repositoryMocks.NewUserRepositoryMock(mc)
+				mock.CreateUserMock.Return(0, model.ErrDatabase)
+				return mock
+			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				return cacheMocks.NewUserCacheMock(mc)
+			},
+		},
+		{
+			name: "error case cache error",
+			userRegister: model.UserRegister{
+				Name:            name,
+				Email:           email,
+				Password:        password,
+				PasswordConfirm: password,
+			},
+			expID:  1,
+			expErr: nil,
+			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
+				return createUserRepositoryCreateMock(mc, t)
+			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
 				mock := cacheMocks.NewUserCacheMock(mc)
-				mock.SetMock.Expect(ctx, userCache).Return(nil)
+				mock.SetMock.Return(model.ErrCache)
 
 				return mock
 			},
-			clock: clock.MockClock{CurrentTime: createdAt},
 		},
 	}
 
-	for _, tt := range tests {
-		tt := tt
+	for _, oneTest := range cases {
+		test := oneTest
 
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			repository := tt.userRepositoryMock(mc)
-			cache := tt.userCacheMock(mc)
-			service := userService.New(repository, cache, tt.clock)
+			repositoryMock := test.userRepositoryMock(mc)
+			cacheMock := test.userCacheMock(mc)
+			service := userService.New(repositoryMock, cacheMock)
 
-			id, err := service.RegisterUser(tt.input.ctx, tt.input.user)
+			actualID, actualErr := service.RegisterUser(ctx, test.userRegister)
 
-			require.Equal(t, tt.output.id, id)
-			require.Equal(t, tt.output.err, err)
+			require.Equal(t, test.expID, actualID)
+			require.Equal(t, test.expErr, actualErr)
 		})
 	}
 }

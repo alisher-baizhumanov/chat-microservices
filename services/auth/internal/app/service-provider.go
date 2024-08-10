@@ -7,7 +7,6 @@ import (
 
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/cache"
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
-	clock "github.com/alisher-baizhumanov/chat-microservices/pkg/clock"
 	grpcLibrary "github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
 	httpLibrary "github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
 	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1"
@@ -77,7 +76,6 @@ func (s *serviceProvider) getUserService() service.UserService {
 		s.userService = userService.New(
 			s.getUserRepository(),
 			s.getUserCache(),
-			&clock.RealClock{},
 		)
 	}
 
@@ -102,7 +100,7 @@ func (s *serviceProvider) getGRPCServer() (*grpcLibrary.Server, error) {
 	)
 }
 
-func (s *serviceProvider) getHTTPserver(ctx context.Context) (*httpLibrary.Server, error) {
+func (s *serviceProvider) getHTTPServer(ctx context.Context) (*httpLibrary.Server, error) {
 	mux := runtime.NewServeMux()
 
 	if err := desc.RegisterUserServiceV1HandlerFromEndpoint(
