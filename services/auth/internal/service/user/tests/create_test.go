@@ -34,7 +34,7 @@ func TestRegister(t *testing.T) {
 			expID:        1,
 			expErr:       nil,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
-				return createUserRepositoryMock(mc, t)
+				return createUserRepositoryCreateMock(mc, t)
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
 				return createUserCacheMock(mc, t)
@@ -109,7 +109,7 @@ func TestRegister(t *testing.T) {
 			expID:  1,
 			expErr: nil,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
-				return createUserRepositoryMock(mc, t)
+				return createUserRepositoryCreateMock(mc, t)
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
 				mock := cacheMocks.NewUserCacheMock(mc)

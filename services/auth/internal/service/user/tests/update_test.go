@@ -1,102 +1,108 @@
 package user_test
 
 import (
-	"context"
-	"github.com/gojuno/minimock/v3"
-	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
-
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
 	cacheMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/mocks"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository"
-	repositoryMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/mocks"
+	"github.com/gojuno/minimock/v3"
+	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 func TestUpdate(t *testing.T) {
 	t.Parallel()
 
-	type input struct {
-		ctx     context.Context
-		id      int64
-		options model.UserUpdateOptions
-	}
+	mc := minimock.NewController(t)
 
-	type output struct {
-		err error
-	}
-
-	var (
-		ctx = context.Background()
-		mc  = minimock.NewController(t)
-
-		expID = int64(1)
-		name  = "name"
-		email = "example@gmail.com"
-		role  = model.UserRole
-		err   = error(nil)
-
-		expOptions = model.UserUpdateOptions{
-			Name:  &name,
-			Email: &email,
-			Role:  &role,
-		}
-	)
-
-	testCases := []struct {
+	cases := []struct {
 		name               string
-		input              input
-		output             output
+		id                 int64
+		options            model.UserUpdateOptions
+		expErr             error
 		userRepositoryMock func(mc *minimock.Controller) repository.UserRepository
 		userCacheMock      func(mc *minimock.Controller) cache.UserCache
 	}{
 		{
-			name: "success case update user",
-			input: input{
-				ctx:     ctx,
-				id:      expID,
-				options: expOptions,
-			},
-			output: output{
-				err: err,
-			},
+			name:    "success case update user",
+			id:      id,
+			options: updateOptions,
+			expErr:  nil,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
-				mock := repositoryMocks.NewUserRepositoryMock(mc)
-				mock.UpdateUserMock.Inspect(func(_ context.Context, actualID int64, actualOptions model.UserUpdateOptions, _ time.Time) {
-					require.Equal(t, expID, actualID)
-					require.Equal(t, expOptions, actualOptions)
-				}).Return(nil)
-
-				return mock
+				return createUserRepositoryUpdateMock(mc, t, id, nil)
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
 				mock := cacheMocks.NewUserCacheMock(mc)
-				mock.DeleteMock.Expect(ctx, expID).Return(nil)
+				mock.DeleteMock.Expect(ctx, int64(1)).Return(nil)
+
+				return mock
+			},
+		},
+		{
+			name:    "error case invalid user ID",
+			id:      0,
+			options: updateOptions,
+			expErr:  model.ErrInvalidID,
+			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
+				return createUserRepositoryUpdateMock(mc, t, 0, model.ErrInvalidID)
+			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				mock := cacheMocks.NewUserCacheMock(mc)
+				mock.DeleteMock.Expect(ctx, int64(0)).Return(model.ErrInvalidID)
+
+				return mock
+			},
+		},
+		{
+			name:    "error case repository error",
+			id:      id,
+			options: updateOptions,
+			expErr:  model.ErrDatabase,
+			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
+				return createUserRepositoryUpdateMock(mc, t, id, model.ErrDatabase)
+			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				mock := cacheMocks.NewUserCacheMock(mc)
+				mock.DeleteMock.Expect(ctx, id).Return(nil)
+
+				return mock
+			},
+		},
+		{
+			name:    "error case cache error",
+			id:      id,
+			options: updateOptions,
+			expErr:  nil,
+			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
+				return createUserRepositoryUpdateMock(mc, t, id, nil)
+			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				mock := cacheMocks.NewUserCacheMock(mc)
+				mock.DeleteMock.Expect(ctx, id).Return(model.ErrCache)
 
 				return mock
 			},
 		},
 	}
 
-	for _, testCase := range testCases {
-		testCase := testCase
+	for _, oneCase := range cases {
+		test := oneCase
 
-		t.Run(testCase.name, func(t *testing.T) {
+		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			repositoryMock := testCase.userRepositoryMock(mc)
-			cacheMock := testCase.userCacheMock(mc)
+			repositoryMock := test.userRepositoryMock(mc)
+			cacheMock := test.userCacheMock(mc)
 			service := userService.New(repositoryMock, cacheMock)
 
 			actualErr := service.UpdateUserFields(
-				testCase.input.ctx,
-				testCase.input.id,
-				testCase.input.options,
+				ctx,
+				test.id,
+				test.options,
 			)
 
-			require.Equal(t, testCase.output.err, actualErr)
+			require.Equal(t, test.expErr, actualErr)
 		})
 	}
 }

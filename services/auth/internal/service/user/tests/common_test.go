@@ -54,14 +54,14 @@ var (
 	}
 )
 
-func createUserRepositoryMock(mc *minimock.Controller, t *testing.T) repository.UserRepository {
+func createUserRepositoryCreateMock(mc *minimock.Controller, t *testing.T) repository.UserRepository {
 	mock := repositoryMocks.NewUserRepositoryMock(mc)
 	mock.CreateUserMock.Inspect(func(_ context.Context, actualUserDB model.UserCreate) {
 		require.Equal(t, expUserDB.Name, actualUserDB.Name)
 		require.Equal(t, expUserDB.Email, actualUserDB.Email)
 		require.Equal(t, expUserDB.Role, actualUserDB.Role)
 		require.Equal(t, expUserDB.HashedPassword, actualUserDB.HashedPassword)
-	}).Return(1, nil)
+	}).Return(id, nil)
 
 	return mock
 }
