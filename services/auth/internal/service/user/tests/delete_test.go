@@ -7,7 +7,6 @@ import (
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/require"
 
-	"github.com/alisher-baizhumanov/chat-microservices/pkg/clock"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
 	cache "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
 	cacheMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/mocks"
@@ -41,7 +40,6 @@ func TestDelete(t *testing.T) {
 		output             output
 		userRepositoryMock func(mc *minimock.Controller) repository.UserRepository
 		userCacheMock      func(mc *minimock.Controller) cache.UserCache
-		clock              clock.Clock
 	}{
 		{
 			name: "success case delete user",
@@ -64,7 +62,6 @@ func TestDelete(t *testing.T) {
 
 				return mock
 			},
-			clock: clock.MockClock{},
 		},
 	}
 
@@ -74,9 +71,9 @@ func TestDelete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			repository := tt.userRepositoryMock(mc)
-			cache := tt.userCacheMock(mc)
-			service := userService.New(repository, cache, tt.clock)
+			repositoryMock := tt.userRepositoryMock(mc)
+			cacheMock := tt.userCacheMock(mc)
+			service := userService.New(repositoryMock, cacheMock)
 
 			err := service.DeleteByID(tt.input.ctx, tt.input.id)
 

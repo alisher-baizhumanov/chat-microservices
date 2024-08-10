@@ -5,7 +5,6 @@ import (
 
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/cache"
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
-	clock "github.com/alisher-baizhumanov/chat-microservices/pkg/clock"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
@@ -71,7 +70,6 @@ func (s *serviceProvider) getUserService() service.UserService {
 		s.userService = userService.New(
 			s.getUserRepository(),
 			s.getUserCache(),
-			&clock.RealClock{},
 		)
 	}
 

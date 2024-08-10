@@ -8,7 +8,6 @@ import (
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/require"
 
-	"github.com/alisher-baizhumanov/chat-microservices/pkg/clock"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
 	cache "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
@@ -47,7 +46,7 @@ func TestRegister(t *testing.T) {
 			PasswordConfirm: password,
 		}
 
-		userDB = model.UserCreate{
+		expUserDB = model.UserCreate{
 			Name:           name,
 			Email:          email,
 			Role:           role,
@@ -55,7 +54,7 @@ func TestRegister(t *testing.T) {
 			HashedPassword: password,
 		}
 
-		userCache = model.User{
+		expUserCache = model.User{
 			ID:        1,
 			Name:      name,
 			Email:     email,
@@ -71,7 +70,6 @@ func TestRegister(t *testing.T) {
 		output             output
 		userRepositoryMock func(mc *minimock.Controller) repository.UserRepository
 		userCacheMock      func(mc *minimock.Controller) cache.UserCache
-		clock              clock.Clock
 	}{
 		{
 			name: "success case create user",
@@ -85,17 +83,26 @@ func TestRegister(t *testing.T) {
 			},
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				mock := repositoryMocks.NewUserRepositoryMock(mc)
-				mock.CreateUserMock.Expect(ctx, userDB).Return(1, nil)
+				mock.CreateUserMock.Inspect(func(_ context.Context, actualUserDB model.UserCreate) {
+					require.Equal(t, expUserDB.Name, actualUserDB.Name)
+					require.Equal(t, expUserDB.Email, actualUserDB.Email)
+					require.Equal(t, expUserDB.Role, actualUserDB.Role)
+					require.Equal(t, expUserDB.HashedPassword, actualUserDB.HashedPassword)
+				}).Return(1, nil)
 
 				return mock
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
 				mock := cacheMocks.NewUserCacheMock(mc)
-				mock.SetMock.Expect(ctx, userCache).Return(nil)
+				mock.SetMock.Inspect(func(_ context.Context, actualUserCache model.User) {
+					require.Equal(t, expUserCache.ID, actualUserCache.ID)
+					require.Equal(t, expUserCache.Name, actualUserCache.Name)
+					require.Equal(t, expUserCache.Email, actualUserCache.Email)
+					require.Equal(t, expUserCache.Role, actualUserCache.Role)
+				}).Return(nil)
 
 				return mock
 			},
-			clock: clock.MockClock{CurrentTime: createdAt},
 		},
 	}
 
@@ -105,9 +112,9 @@ func TestRegister(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			repository := tt.userRepositoryMock(mc)
-			cache := tt.userCacheMock(mc)
-			service := userService.New(repository, cache, tt.clock)
+			repositoryMock := tt.userRepositoryMock(mc)
+			cacheMock := tt.userCacheMock(mc)
+			service := userService.New(repositoryMock, cacheMock)
 
 			id, err := service.RegisterUser(tt.input.ctx, tt.input.user)
 

@@ -2,16 +2,14 @@ package user_test
 
 import (
 	"context"
+	"github.com/gojuno/minimock/v3"
+	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
 
-	"github.com/gojuno/minimock/v3"
-	"github.com/stretchr/testify/require"
-
-	"github.com/alisher-baizhumanov/chat-microservices/pkg/clock"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
-	cache "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
 	cacheMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/mocks"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository"
 	repositoryMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/mocks"
@@ -34,14 +32,13 @@ func TestUpdate(t *testing.T) {
 		ctx = context.Background()
 		mc  = minimock.NewController(t)
 
-		id        = int64(1)
-		name      = "name"
-		email     = "example@gmail.com"
-		role      = model.UserRole
-		updatedAt = time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
-		err       = error(nil)
+		expID = int64(1)
+		name  = "name"
+		email = "example@gmail.com"
+		role  = model.UserRole
+		err   = error(nil)
 
-		options = model.UserUpdateOptions{
+		expOptions = model.UserUpdateOptions{
 			Name:  &name,
 			Email: &email,
 			Role:  &role,
@@ -54,31 +51,32 @@ func TestUpdate(t *testing.T) {
 		output             output
 		userRepositoryMock func(mc *minimock.Controller) repository.UserRepository
 		userCacheMock      func(mc *minimock.Controller) cache.UserCache
-		clock              clock.Clock
 	}{
 		{
 			name: "success case update user",
 			input: input{
 				ctx:     ctx,
-				id:      id,
-				options: options,
+				id:      expID,
+				options: expOptions,
 			},
 			output: output{
 				err: err,
 			},
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				mock := repositoryMocks.NewUserRepositoryMock(mc)
-				mock.UpdateUserMock.Expect(ctx, id, options, updatedAt).Return(err)
+				mock.UpdateUserMock.Inspect(func(_ context.Context, actualID int64, actualOptions model.UserUpdateOptions, _ time.Time) {
+					require.Equal(t, expID, actualID)
+					require.Equal(t, expOptions, actualOptions)
+				}).Return(nil)
 
 				return mock
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
 				mock := cacheMocks.NewUserCacheMock(mc)
-				mock.DeleteMock.Expect(ctx, id).Return(nil)
+				mock.DeleteMock.Expect(ctx, expID).Return(nil)
 
 				return mock
 			},
-			clock: clock.MockClock{CurrentTime: updatedAt},
 		},
 	}
 
@@ -88,17 +86,17 @@ func TestUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			repository := tt.userRepositoryMock(mc)
-			cache := tt.userCacheMock(mc)
-			service := userService.New(repository, cache, tt.clock)
+			repositoryMock := tt.userRepositoryMock(mc)
+			cacheMock := tt.userCacheMock(mc)
+			service := userService.New(repositoryMock, cacheMock)
 
-			err := service.UpdateUserFields(
+			actualErr := service.UpdateUserFields(
 				tt.input.ctx,
 				tt.input.id,
 				tt.input.options,
 			)
 
-			require.Equal(t, tt.output.err, err)
+			require.Equal(t, tt.output.err, actualErr)
 		})
 	}
 }

@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 )
@@ -21,6 +22,6 @@ func (s *service) UpdateUserFields(ctx context.Context, id int64, userUpdate mod
 		ctx,
 		id,
 		userUpdate,
-		s.clock.Now(),
+		time.Now(),
 	)
 }

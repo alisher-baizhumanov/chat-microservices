@@ -8,7 +8,6 @@ import (
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/require"
 
-	"github.com/alisher-baizhumanov/chat-microservices/pkg/clock"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
 	cache "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
@@ -57,7 +56,6 @@ func TestGet(t *testing.T) {
 		output             output
 		userRepositoryMock func(mc *minimock.Controller) repository.UserRepository
 		userCacheMock      func(mc *minimock.Controller) cache.UserCache
-		clock              clock.Clock
 	}{
 		{
 			name: "success case get user",
@@ -82,7 +80,6 @@ func TestGet(t *testing.T) {
 
 				return mock
 			},
-			clock: clock.MockClock{},
 		},
 	}
 
@@ -92,9 +89,9 @@ func TestGet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			repository := tt.userRepositoryMock(mc)
-			cache := tt.userCacheMock(mc)
-			service := userService.New(repository, cache, tt.clock)
+			repositoryMock := tt.userRepositoryMock(mc)
+			cacheMock := tt.userCacheMock(mc)
+			service := userService.New(repositoryMock, cacheMock)
 
 			user, err := service.GetByID(tt.input.ctx, tt.input.id)
 
