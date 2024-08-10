@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	"testing"
 
 	"github.com/gojuno/minimock/v3"
@@ -14,7 +15,7 @@ import (
 	repositoryMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/mocks"
 )
 
-func TestDelete(t *testing.T) {
+func TestDeleteByID(t *testing.T) {
 	t.Parallel()
 
 	type input struct {
@@ -27,14 +28,13 @@ func TestDelete(t *testing.T) {
 	}
 
 	var (
-		ctx = context.Background()
-		mc  = minimock.NewController(t)
+		mc = minimock.NewController(t)
 
 		id  = int64(1)
 		err = error(nil)
 	)
 
-	testCases := []struct {
+	cases := []struct {
 		name               string
 		input              input
 		output             output
@@ -63,21 +63,87 @@ func TestDelete(t *testing.T) {
 				return mock
 			},
 		},
+		{
+			name: "error case invalid user ID",
+			input: input{
+				ctx: ctx,
+				id:  0,
+			},
+			output: output{
+				err: model.ErrInvalidID,
+			},
+			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
+				mock := repositoryMocks.NewUserRepositoryMock(mc)
+				mock.DeleteUserMock.Expect(ctx, int64(0)).Return(model.ErrInvalidID)
+
+				return mock
+			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				mock := cacheMocks.NewUserCacheMock(mc)
+				mock.DeleteMock.Expect(ctx, int64(0)).Return(model.ErrInvalidID)
+
+				return mock
+			},
+		},
+		{
+			name: "error case repository error",
+			input: input{
+				ctx: ctx,
+				id:  1,
+			},
+			output: output{
+				err: model.ErrDatabase,
+			},
+			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
+				mock := repositoryMocks.NewUserRepositoryMock(mc)
+				mock.DeleteUserMock.Expect(ctx, id).Return(model.ErrDatabase)
+
+				return mock
+			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				mock := cacheMocks.NewUserCacheMock(mc)
+				mock.DeleteMock.Expect(ctx, id).Return(nil)
+
+				return mock
+			},
+		},
+		{
+			name: "error case cache error",
+			input: input{
+				ctx: ctx,
+				id:  1,
+			},
+			output: output{
+				err: nil,
+			},
+			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
+				mock := repositoryMocks.NewUserRepositoryMock(mc)
+				mock.DeleteUserMock.Expect(ctx, id).Return(nil)
+
+				return mock
+			},
+			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
+				mock := cacheMocks.NewUserCacheMock(mc)
+				mock.DeleteMock.Expect(ctx, id).Return(model.ErrCache)
+
+				return mock
+			},
+		},
 	}
 
-	for _, testCase := range testCases {
-		testCase := testCase
+	for _, oneCase := range cases {
+		test := oneCase
 
-		t.Run(testCase.name, func(t *testing.T) {
+		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			repositoryMock := testCase.userRepositoryMock(mc)
-			cacheMock := testCase.userCacheMock(mc)
+			repositoryMock := test.userRepositoryMock(mc)
+			cacheMock := test.userCacheMock(mc)
 			service := userService.New(repositoryMock, cacheMock)
 
-			err := service.DeleteByID(testCase.input.ctx, testCase.input.id)
+			err := service.DeleteByID(test.input.ctx, test.input.id)
 
-			require.Equal(t, testCase.output.err, err)
+			require.Equal(t, test.output.err, err)
 		})
 	}
 }
