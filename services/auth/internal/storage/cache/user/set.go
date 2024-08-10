@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/user/converter"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/user/converter"
 )
 
 func (u *userCache) Set(ctx context.Context, userConverted model.User) error {
@@ -21,6 +21,6 @@ func (u *userCache) Set(ctx context.Context, userConverted model.User) error {
 	); err != nil {
 		return fmt.Errorf("%w, message: %w", model.ErrCache, err)
 	}
-	
+
 	return nil
 }
