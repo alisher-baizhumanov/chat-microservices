@@ -1,7 +1,6 @@
 package user_test
 
 import (
-	"context"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	"testing"
 
@@ -18,60 +17,36 @@ import (
 func TestDeleteByID(t *testing.T) {
 	t.Parallel()
 
-	type input struct {
-		ctx context.Context
-		id  int64
-	}
-
-	type output struct {
-		err error
-	}
-
-	var (
-		mc = minimock.NewController(t)
-
-		id  = int64(1)
-		err = error(nil)
-	)
+	mc := minimock.NewController(t)
 
 	cases := []struct {
 		name               string
-		input              input
-		output             output
+		id                 int64
+		expErr             error
 		userRepositoryMock func(mc *minimock.Controller) repository.UserRepository
 		userCacheMock      func(mc *minimock.Controller) cache.UserCache
 	}{
 		{
-			name: "success case delete user",
-			input: input{
-				ctx: ctx,
-				id:  1,
-			},
-			output: output{
-				err: nil,
-			},
+			name:   "success case delete user",
+			id:     1,
+			expErr: nil,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				mock := repositoryMocks.NewUserRepositoryMock(mc)
-				mock.DeleteUserMock.Expect(ctx, id).Return(err)
+				mock.DeleteUserMock.Expect(ctx, id).Return(nil)
 
 				return mock
 			},
 			userCacheMock: func(mc *minimock.Controller) cache.UserCache {
 				mock := cacheMocks.NewUserCacheMock(mc)
-				mock.DeleteMock.Expect(ctx, id).Return(err)
+				mock.DeleteMock.Expect(ctx, id).Return(nil)
 
 				return mock
 			},
 		},
 		{
-			name: "error case invalid user ID",
-			input: input{
-				ctx: ctx,
-				id:  0,
-			},
-			output: output{
-				err: model.ErrInvalidID,
-			},
+			name:   "error case invalid user ID",
+			id:     0,
+			expErr: model.ErrInvalidID,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				mock := repositoryMocks.NewUserRepositoryMock(mc)
 				mock.DeleteUserMock.Expect(ctx, int64(0)).Return(model.ErrInvalidID)
@@ -86,14 +61,9 @@ func TestDeleteByID(t *testing.T) {
 			},
 		},
 		{
-			name: "error case repository error",
-			input: input{
-				ctx: ctx,
-				id:  1,
-			},
-			output: output{
-				err: model.ErrDatabase,
-			},
+			name:   "error case repository error",
+			id:     1,
+			expErr: model.ErrDatabase,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				mock := repositoryMocks.NewUserRepositoryMock(mc)
 				mock.DeleteUserMock.Expect(ctx, id).Return(model.ErrDatabase)
@@ -108,14 +78,9 @@ func TestDeleteByID(t *testing.T) {
 			},
 		},
 		{
-			name: "error case cache error",
-			input: input{
-				ctx: ctx,
-				id:  1,
-			},
-			output: output{
-				err: nil,
-			},
+			name:   "error case cache error",
+			id:     1,
+			expErr: nil,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				mock := repositoryMocks.NewUserRepositoryMock(mc)
 				mock.DeleteUserMock.Expect(ctx, id).Return(nil)
@@ -141,9 +106,9 @@ func TestDeleteByID(t *testing.T) {
 			cacheMock := test.userCacheMock(mc)
 			service := userService.New(repositoryMock, cacheMock)
 
-			err := service.DeleteByID(test.input.ctx, test.input.id)
+			actualErr := service.DeleteByID(ctx, test.id)
 
-			require.Equal(t, test.output.err, err)
+			require.Equal(t, test.expErr, actualErr)
 		})
 	}
 }

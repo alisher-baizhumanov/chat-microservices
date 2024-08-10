@@ -8,9 +8,9 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/user/converter"
 	cacheData "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/user/model"
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 )
 
 func (u *userCache) Get(ctx context.Context, id int64) (model.User, error) {

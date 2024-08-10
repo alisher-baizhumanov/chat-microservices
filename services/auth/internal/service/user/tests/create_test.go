@@ -22,17 +22,17 @@ func TestRegister(t *testing.T) {
 	cases := []struct {
 		name               string
 		mc                 *minimock.Controller
-		input              model.UserRegister
-		expectedID         int64
-		expectedErr        error
+		userRegister       model.UserRegister
+		expID              int64
+		expErr             error
 		userRepositoryMock func(mc *minimock.Controller) repository.UserRepository
 		userCacheMock      func(mc *minimock.Controller) cache.UserCache
 	}{
 		{
-			name:        "success case create user",
-			input:       userRegister,
-			expectedID:  1,
-			expectedErr: nil,
+			name:         "success case create user",
+			userRegister: userRegister,
+			expID:        1,
+			expErr:       nil,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				return createUserRepositoryMock(mc, t)
 			},
@@ -42,14 +42,14 @@ func TestRegister(t *testing.T) {
 		},
 		{
 			name: "error case user already exists",
-			input: model.UserRegister{
+			userRegister: model.UserRegister{
 				Name:            name,
 				Email:           email,
 				Password:        password,
 				PasswordConfirm: password,
 			},
-			expectedID:  0,
-			expectedErr: model.ErrNonUniqueUsername,
+			expID:  0,
+			expErr: model.ErrNonUniqueUsername,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				mock := repositoryMocks.NewUserRepositoryMock(mc)
 				mock.CreateUserMock.Return(0, model.ErrNonUniqueUsername)
@@ -61,14 +61,14 @@ func TestRegister(t *testing.T) {
 		},
 		{
 			name: "error case email already exists",
-			input: model.UserRegister{
+			userRegister: model.UserRegister{
 				Name:            name,
 				Email:           "email",
 				Password:        password,
 				PasswordConfirm: password,
 			},
-			expectedID:  0,
-			expectedErr: model.ErrNonUniqueEmail,
+			expID:  0,
+			expErr: model.ErrNonUniqueEmail,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				mock := repositoryMocks.NewUserRepositoryMock(mc)
 				mock.CreateUserMock.Return(0, model.ErrNonUniqueEmail)
@@ -81,14 +81,14 @@ func TestRegister(t *testing.T) {
 		},
 		{
 			name: "error case repository error",
-			input: model.UserRegister{
+			userRegister: model.UserRegister{
 				Name:            name,
 				Email:           email,
 				Password:        password,
 				PasswordConfirm: password,
 			},
-			expectedID:  0,
-			expectedErr: model.ErrDatabase,
+			expID:  0,
+			expErr: model.ErrDatabase,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				mock := repositoryMocks.NewUserRepositoryMock(mc)
 				mock.CreateUserMock.Return(0, model.ErrDatabase)
@@ -100,14 +100,14 @@ func TestRegister(t *testing.T) {
 		},
 		{
 			name: "error case cache error",
-			input: model.UserRegister{
+			userRegister: model.UserRegister{
 				Name:            name,
 				Email:           email,
 				Password:        password,
 				PasswordConfirm: password,
 			},
-			expectedID:  1,
-			expectedErr: nil,
+			expID:  1,
+			expErr: nil,
 			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
 				return createUserRepositoryMock(mc, t)
 			},
@@ -130,10 +130,10 @@ func TestRegister(t *testing.T) {
 			cacheMock := test.userCacheMock(mc)
 			service := userService.New(repositoryMock, cacheMock)
 
-			id, err := service.RegisterUser(ctx, test.input)
+			actualID, actualErr := service.RegisterUser(ctx, test.userRegister)
 
-			require.Equal(t, test.expectedID, id)
-			require.Equal(t, test.expectedErr, err)
+			require.Equal(t, test.expID, actualID)
+			require.Equal(t, test.expErr, actualErr)
 		})
 	}
 }

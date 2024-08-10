@@ -16,11 +16,18 @@ import (
 var (
 	ctx = context.Background()
 
+	id        = int64(1)
 	name      = "name"
 	email     = "example@gmail.com"
 	role      = model.UserRole
 	password  = []byte("secret_password")
 	createdAt = time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
+
+	updateOptions = model.UserUpdateOptions{
+		Name:  &name,
+		Email: &email,
+		Role:  &role,
+	}
 
 	userRegister = model.UserRegister{
 		Name:            name,
@@ -37,8 +44,8 @@ var (
 		HashedPassword: password,
 	}
 
-	expUserCache = model.User{
-		ID:        1,
+	expUserInfo = model.User{
+		ID:        id,
 		Name:      name,
 		Email:     email,
 		Role:      role,
@@ -62,11 +69,21 @@ func createUserRepositoryMock(mc *minimock.Controller, t *testing.T) repository.
 func createUserCacheMock(mc *minimock.Controller, t *testing.T) cache.UserCache {
 	mock := cacheMocks.NewUserCacheMock(mc)
 	mock.SetMock.Inspect(func(_ context.Context, actualUserCache model.User) {
-		require.Equal(t, expUserCache.ID, actualUserCache.ID)
-		require.Equal(t, expUserCache.Name, actualUserCache.Name)
-		require.Equal(t, expUserCache.Email, actualUserCache.Email)
-		require.Equal(t, expUserCache.Role, actualUserCache.Role)
+		require.Equal(t, expUserInfo.ID, actualUserCache.ID)
+		require.Equal(t, expUserInfo.Name, actualUserCache.Name)
+		require.Equal(t, expUserInfo.Email, actualUserCache.Email)
+		require.Equal(t, expUserInfo.Role, actualUserCache.Role)
 	}).Return(nil)
+
+	return mock
+}
+
+func createUserRepositoryUpdateMock(mc *minimock.Controller, t *testing.T, expID int64, returnErr error) repository.UserRepository {
+	mock := repositoryMocks.NewUserRepositoryMock(mc)
+	mock.UpdateUserMock.Inspect(func(_ context.Context, id int64, actualUserUpdate model.UserUpdateOptions, _ time.Time) {
+		require.Equal(t, expID, id)
+		require.Equal(t, updateOptions, actualUserUpdate)
+	}).Return(returnErr)
 
 	return mock
 }
