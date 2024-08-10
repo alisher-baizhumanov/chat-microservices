@@ -2,15 +2,17 @@ package user_test
 
 import (
 	"context"
+	"testing"
+	"time"
+
+	"github.com/gojuno/minimock/v3"
+	"github.com/stretchr/testify/require"
+
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
 	cacheMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/mocks"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository"
 	repositoryMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/mocks"
-	"github.com/gojuno/minimock/v3"
-	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
 )
 
 var (

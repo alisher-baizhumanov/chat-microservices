@@ -1,9 +1,10 @@
 package user_test
 
 import (
+	"testing"
+
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/require"
-	"testing"
 
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"

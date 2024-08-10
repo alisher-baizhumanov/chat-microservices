@@ -1,12 +1,12 @@
 package user_test
 
 import (
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	"testing"
 
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/require"
 
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
 	cacheMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/mocks"
