@@ -45,7 +45,7 @@ func TestUpdate(t *testing.T) {
 		}
 	)
 
-	tests := []struct {
+	testCases := []struct {
 		name               string
 		input              input
 		output             output
@@ -80,23 +80,23 @@ func TestUpdate(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		tt := tt
+	for _, testCase := range testCases {
+		testCase := testCase
 
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			repositoryMock := tt.userRepositoryMock(mc)
-			cacheMock := tt.userCacheMock(mc)
+			repositoryMock := testCase.userRepositoryMock(mc)
+			cacheMock := testCase.userCacheMock(mc)
 			service := userService.New(repositoryMock, cacheMock)
 
 			actualErr := service.UpdateUserFields(
-				tt.input.ctx,
-				tt.input.id,
-				tt.input.options,
+				testCase.input.ctx,
+				testCase.input.id,
+				testCase.input.options,
 			)
 
-			require.Equal(t, tt.output.err, actualErr)
+			require.Equal(t, testCase.output.err, actualErr)
 		})
 	}
 }

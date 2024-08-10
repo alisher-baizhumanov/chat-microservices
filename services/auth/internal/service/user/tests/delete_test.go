@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
-	cache "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
 	cacheMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/mocks"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository"
 	repositoryMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/mocks"
@@ -34,7 +34,7 @@ func TestDelete(t *testing.T) {
 		err = error(nil)
 	)
 
-	tests := []struct {
+	testCases := []struct {
 		name               string
 		input              input
 		output             output
@@ -65,19 +65,19 @@ func TestDelete(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		tt := tt
+	for _, testCase := range testCases {
+		testCase := testCase
 
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			repositoryMock := tt.userRepositoryMock(mc)
-			cacheMock := tt.userCacheMock(mc)
+			repositoryMock := testCase.userRepositoryMock(mc)
+			cacheMock := testCase.userCacheMock(mc)
 			service := userService.New(repositoryMock, cacheMock)
 
-			err := service.DeleteByID(tt.input.ctx, tt.input.id)
+			err := service.DeleteByID(testCase.input.ctx, testCase.input.id)
 
-			require.Equal(t, tt.output.err, err)
+			require.Equal(t, testCase.output.err, err)
 		})
 	}
 }

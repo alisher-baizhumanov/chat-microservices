@@ -10,7 +10,7 @@ import (
 
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
-	cache "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
 	cacheMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/mocks"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository"
 	repositoryMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/mocks"
@@ -64,7 +64,7 @@ func TestRegister(t *testing.T) {
 		}
 	)
 
-	tests := []struct {
+	testCases := []struct {
 		name               string
 		input              input
 		output             output
@@ -106,20 +106,20 @@ func TestRegister(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		tt := tt
+	for _, testCase := range testCases {
+		testCase := testCase
 
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			repositoryMock := tt.userRepositoryMock(mc)
-			cacheMock := tt.userCacheMock(mc)
+			repositoryMock := testCase.userRepositoryMock(mc)
+			cacheMock := testCase.userCacheMock(mc)
 			service := userService.New(repositoryMock, cacheMock)
 
-			id, err := service.RegisterUser(tt.input.ctx, tt.input.user)
+			id, err := service.RegisterUser(testCase.input.ctx, testCase.input.user)
 
-			require.Equal(t, tt.output.id, id)
-			require.Equal(t, tt.output.err, err)
+			require.Equal(t, testCase.output.id, id)
+			require.Equal(t, testCase.output.err, err)
 		})
 	}
 }
