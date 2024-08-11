@@ -3,12 +3,12 @@ package app
 import (
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo"
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/api/grpc"
-	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository"
-	chatRepository "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository/chat"
-	messageRepository "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/repository/message"
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/service"
 	chatService "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/service/chat"
 	messageService "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/service/message"
+	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/storage/repository"
+	chatRepository "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/storage/repository/chat"
+	messageRepository "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/storage/repository/message"
 )
 
 type serviceProvider struct {

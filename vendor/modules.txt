@@ -7,6 +7,9 @@ github.com/caarlos0/env/v11
 # github.com/cespare/xxhash/v2 v2.3.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
+# github.com/davecgh/go-spew v1.1.1
+## explicit
+github.com/davecgh/go-spew/spew
 # github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f
 ## explicit
 github.com/dgryski/go-rendezvous
@@ -14,6 +17,9 @@ github.com/dgryski/go-rendezvous
 ## explicit; go 1.18
 github.com/georgysavva/scany/v2/dbscan
 github.com/georgysavva/scany/v2/pgxscan
+# github.com/gojuno/minimock/v3 v3.3.13
+## explicit; go 1.22
+github.com/gojuno/minimock/v3
 # github.com/golang/snappy v0.0.4
 ## explicit
 github.com/golang/snappy
@@ -60,6 +66,9 @@ github.com/lann/ps
 # github.com/montanaflynn/stats v0.7.1
 ## explicit; go 1.13
 github.com/montanaflynn/stats
+# github.com/pmezard/go-difflib v1.0.0
+## explicit
+github.com/pmezard/go-difflib/difflib
 # github.com/redis/go-redis/v9 v9.0.0-rc.4
 ## explicit; go 1.17
 github.com/redis/go-redis/v9
@@ -70,6 +79,10 @@ github.com/redis/go-redis/v9/internal/pool
 github.com/redis/go-redis/v9/internal/proto
 github.com/redis/go-redis/v9/internal/rand
 github.com/redis/go-redis/v9/internal/util
+# github.com/stretchr/testify v1.9.0
+## explicit; go 1.17
+github.com/stretchr/testify/assert
+github.com/stretchr/testify/require
 # github.com/xdg-go/pbkdf2 v1.0.0
 ## explicit; go 1.9
 github.com/xdg-go/pbkdf2
@@ -267,3 +280,6 @@ google.golang.org/protobuf/types/known/durationpb
 google.golang.org/protobuf/types/known/emptypb
 google.golang.org/protobuf/types/known/timestamppb
 google.golang.org/protobuf/types/known/wrapperspb
+# gopkg.in/yaml.v3 v3.0.1
+## explicit
+gopkg.in/yaml.v3
