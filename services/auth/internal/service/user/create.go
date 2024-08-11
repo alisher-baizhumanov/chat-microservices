@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -14,11 +15,16 @@ import (
 func (s *service) RegisterUser(ctx context.Context, userRegister model.UserRegister) (int64, error) {
 	createdAt := time.Now()
 
+	hash, err := s.hasher.Hash(userRegister.Password)
+	if err != nil {
+		return 0, fmt.Errorf("%w, message: %w", model.ErrPasswordHashing, err)
+	}
+
 	userCreate := model.UserCreate{
 		Name:           userRegister.Name,
 		Email:          userRegister.Email,
 		Role:           model.UserRole,
-		HashedPassword: userRegister.Password,
+		HashedPassword: hash,
 		CreatedAt:      createdAt,
 	}
 

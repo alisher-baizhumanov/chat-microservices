@@ -104,7 +104,7 @@ func TestDeleteByID(t *testing.T) {
 
 			repositoryMock := test.userRepositoryMock(mc)
 			cacheMock := test.userCacheMock(mc)
-			service := userService.New(repositoryMock, cacheMock)
+			service := userService.New(repositoryMock, cacheMock, nil)
 
 			actualErr := service.DeleteByID(ctx, test.id)
 

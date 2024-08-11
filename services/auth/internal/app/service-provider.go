@@ -18,6 +18,8 @@ import (
 	userCache "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/user"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository"
 	userRepository "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/user"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/utils/hasher"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/utils/hasher/argon2id"
 )
 
 type serviceProvider struct {
@@ -76,6 +78,7 @@ func (s *serviceProvider) getUserService() service.UserService {
 		s.userService = userService.New(
 			s.getUserRepository(),
 			s.getUserCache(),
+			argon2id.New(hasher.DefaultOptions),
 		)
 	}
 

@@ -128,7 +128,7 @@ func TestRegister(t *testing.T) {
 
 			repositoryMock := test.userRepositoryMock(mc)
 			cacheMock := test.userCacheMock(mc)
-			service := userService.New(repositoryMock, cacheMock)
+			service := userService.New(repositoryMock, cacheMock, passwordHasher)
 
 			actualID, actualErr := service.RegisterUser(ctx, test.userRegister)
 
