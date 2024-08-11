@@ -9,7 +9,8 @@ import (
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
 	grpcLibrary "github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
 	httpLibrary "github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
-	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1"
+	descAuth "github.com/alisher-baizhumanov/chat-microservices/protos/generated/auth-v1"
+	descUser "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1"
 	grpcHandler "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/config"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service"
@@ -23,7 +24,8 @@ import (
 )
 
 type serviceProvider struct {
-	gRPCHandlers   *grpcHandler.ServerHandlers
+	userHandlers   *grpcHandler.UserHandlers
+	authHandlers   *grpcHandler.AuthHandlers
 	userService    service.UserService
 	userRepository repository.UserRepository
 	dbClient       db.Client
@@ -85,28 +87,55 @@ func (s *serviceProvider) getUserService() service.UserService {
 	return s.userService
 }
 
-func (s *serviceProvider) getGRPCHandlers() *grpcHandler.ServerHandlers {
-	if s.gRPCHandlers == nil {
-		s.gRPCHandlers = grpcHandler.NewUserGRPCHandlers(
+func (s *serviceProvider) getUserHandlers() *grpcHandler.UserHandlers {
+	if s.userHandlers == nil {
+		s.userHandlers = grpcHandler.NewUserHandlers(
 			s.getUserService(),
 		)
 	}
 
-	return s.gRPCHandlers
+	return s.userHandlers
+}
+
+func (s *serviceProvider) getAuthHandlers() *grpcHandler.AuthHandlers {
+	if s.authHandlers == nil {
+		s.authHandlers = grpcHandler.NewAuthHandlers(
+			nil,
+		)
+	}
+
+	return s.authHandlers
 }
 
 func (s *serviceProvider) getGRPCServer() (*grpcLibrary.Server, error) {
 	return grpcLibrary.NewGRPCServer(
 		s.getConfig().GRPCServerPort,
-		&desc.UserServiceV1_ServiceDesc,
-		s.getGRPCHandlers(),
+		[]grpcLibrary.Service{
+			{
+				ServiceDesc: &descUser.UserServiceV1_ServiceDesc,
+				Handler:     s.getUserHandlers(),
+			},
+			{
+				ServiceDesc: &descAuth.AuthServiceV1_ServiceDesc,
+				Handler:     s.getAuthHandlers(),
+			},
+		},
 	)
 }
 
 func (s *serviceProvider) getHTTPServer(ctx context.Context) (*httpLibrary.Server, error) {
 	mux := runtime.NewServeMux()
 
-	if err := desc.RegisterUserServiceV1HandlerFromEndpoint(
+	if err := descUser.RegisterUserServiceV1HandlerFromEndpoint(
+		ctx,
+		mux,
+		s.getConfig().GRPCAddress(),
+		s.getConfig().GRPCDialOptions(),
+	); err != nil {
+		return nil, err
+	}
+
+	if err := descAuth.RegisterAuthServiceV1HandlerFromEndpoint(
 		ctx,
 		mux,
 		s.getConfig().GRPCAddress(),
