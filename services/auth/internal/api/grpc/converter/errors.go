@@ -27,6 +27,11 @@ func ErrorModelToProto(err error) error {
 		return status.Error(codes.InvalidArgument, "this email is already taken")
 	case errors.Is(err, model.ErrNonUniqueUsername):
 		return status.Error(codes.InvalidArgument, "this name is already taken")
+	case errors.Is(err, model.ErrInvalidCredentials):
+		return status.Error(codes.InvalidArgument, "invalid email or password")
+
+	case errors.Is(err, model.ErrInvalidToken):
+		return status.Error(codes.Unauthenticated, "invalid token")
 
 	case errors.Is(err, model.ErrNotFound):
 		return status.Error(codes.NotFound, "")

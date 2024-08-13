@@ -26,6 +26,9 @@ github.com/georgysavva/scany/v2/pgxscan
 # github.com/gojuno/minimock/v3 v3.3.13
 ## explicit; go 1.22
 github.com/gojuno/minimock/v3
+# github.com/golang-jwt/jwt/v5 v5.2.1
+## explicit; go 1.18
+github.com/golang-jwt/jwt/v5
 # github.com/golang/snappy v0.0.4
 ## explicit
 github.com/golang/snappy

@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 // User represents a user info in the system with basic details and timestamps.
 type User struct {
@@ -34,4 +36,9 @@ type UserCreate struct {
 	Role           Role
 	HashedPassword []byte
 	CreatedAt      time.Time
+}
+
+type UserClaims struct {
+	ID   int64
+	Role Role
 }
