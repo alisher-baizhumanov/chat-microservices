@@ -13,12 +13,18 @@ import (
 
 // Config holds configuration settings for the application.
 type Config struct {
-	GRPCServerHost string        `env:"GRPC_SERVER_HOST,required"`
-	GRPCServerPort int           `env:"GRPC_SERVER_PORT,required"`
-	HTTPServerPort int           `env:"HTTP_SERVER_PORT,required"`
-	DSN            string        `env:"DB_DSN,required"`
-	CacheDSN       string        `env:"CACHE_DSN,required"`
-	CacheTTL       time.Duration `env:"CACHE_TTL,required"`
+	GRPCServerHost string `env:"GRPC_SERVER_HOST,required"`
+	GRPCServerPort int    `env:"GRPC_SERVER_PORT,required"`
+	HTTPServerPort int    `env:"HTTP_SERVER_PORT,required"`
+
+	DatabaseDSN string        `env:"DB_DSN,required"`
+	CacheDSN    string        `env:"CACHE_DSN,required"`
+	CacheTTL    time.Duration `env:"CACHE_TTL,required"`
+
+	AccessTokenTTL   time.Duration `env:"ACCESS_TOKEN_TTL,required"`
+	RefreshTokenTTL  time.Duration `env:"REFRESH_TOKEN_TTL,required"`
+	AccessSecretKey  []byte        `env:"ACCESS_SECRET_KEY,required"`
+	RefreshSecretKey []byte        `env:"REFRESH_SECRET_KEY,required"`
 }
 
 // GRPCAddress returns the gRPC server address in the format "host:port".

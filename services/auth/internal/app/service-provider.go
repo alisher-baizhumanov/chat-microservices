@@ -2,6 +2,8 @@ package app
 
 import (
 	"context"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/utils/jwt"
+	token_manager "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/utils/jwt/token-manager"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 
@@ -14,6 +16,7 @@ import (
 	grpcHandler "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/config"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service"
+	authService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/auth"
 	userService "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/service/user"
 	cacheInterface "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache"
 	userCache "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/user"
@@ -24,14 +27,22 @@ import (
 )
 
 type serviceProvider struct {
-	userHandlers   *grpcHandler.UserHandlers
-	authHandlers   *grpcHandler.AuthHandlers
-	userService    service.UserService
+	cfg *config.Config
+
+	userHandlers *grpcHandler.UserHandlers
+	authHandlers *grpcHandler.AuthHandlers
+
+	userService service.UserService
+	authService service.AuthService
+
+	tokenManager   jwt.TokenManager
+	passwordHasher hasher.PasswordHasher
+
 	userRepository repository.UserRepository
-	dbClient       db.Client
-	cacheClient    cache.Client
 	userCache      cacheInterface.UserCache
-	cfg            *config.Config
+
+	dbClient    db.Client
+	cacheClient cache.Client
 }
 
 func newServiceProvider(dbClient db.Client, cacheClient cache.Client, cfg *config.Config) serviceProvider {
@@ -75,12 +86,45 @@ func (s *serviceProvider) getUserCache() cacheInterface.UserCache {
 	return s.userCache
 }
 
+func (s *serviceProvider) getPasswordHasher() hasher.PasswordHasher {
+	if s.passwordHasher == nil {
+		s.passwordHasher = argon2id.New(hasher.DefaultOptions)
+	}
+
+	return s.passwordHasher
+}
+
+func (s *serviceProvider) getTokenManager() jwt.TokenManager {
+	if s.tokenManager == nil {
+		s.tokenManager = token_manager.New(
+			s.getConfig().AccessSecretKey,
+			s.getConfig().RefreshSecretKey,
+			s.getConfig().AccessTokenTTL,
+			s.getConfig().RefreshTokenTTL,
+		)
+	}
+
+	return s.tokenManager
+}
+
+func (s *serviceProvider) getAuthService() service.AuthService {
+	if s.authService == nil {
+		s.authService = authService.New(
+			s.getUserRepository(),
+			s.getPasswordHasher(),
+			s.getTokenManager(),
+		)
+	}
+
+	return s.authService
+}
+
 func (s *serviceProvider) getUserService() service.UserService {
 	if s.userService == nil {
 		s.userService = userService.New(
 			s.getUserRepository(),
 			s.getUserCache(),
-			argon2id.New(hasher.DefaultOptions),
+			s.getPasswordHasher(),
 		)
 	}
 
@@ -100,7 +144,7 @@ func (s *serviceProvider) getUserHandlers() *grpcHandler.UserHandlers {
 func (s *serviceProvider) getAuthHandlers() *grpcHandler.AuthHandlers {
 	if s.authHandlers == nil {
 		s.authHandlers = grpcHandler.NewAuthHandlers(
-			nil,
+			s.authService,
 		)
 	}
 
