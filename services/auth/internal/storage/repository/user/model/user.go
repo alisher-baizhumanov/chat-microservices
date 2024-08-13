@@ -27,3 +27,10 @@ type UserCreate struct {
 	HashedPassword []byte
 	CreatedAt      time.Time
 }
+
+type Credentials struct {
+	ID             int64  `db:"id"`
+	Email          string `db:"email"`
+	HashedPassword []byte `db:"hashed_password"`
+	Role           int8   `db:"role"`
+}

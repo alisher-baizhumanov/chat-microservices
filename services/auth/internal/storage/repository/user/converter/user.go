@@ -28,6 +28,16 @@ func UserDataToModel(user data.User) model.User {
 	}
 }
 
+// CredentialsDataToModel converts data.Credentials to model.Credentials.
+func CredentialsDataToModel(user data.Credentials) model.Credentials {
+	return model.Credentials{
+		ID:             user.ID,
+		Email:          user.Email,
+		HashedPassword: user.HashedPassword,
+		Role:           model.Role(user.Role),
+	}
+}
+
 // UserUpdateOptionModelToData converts model.UserUpdateOptions to data.UserUpdateOptions.
 func UserUpdateOptionModelToData(options model.UserUpdateOptions) data.UserUpdateOptions {
 	var role *int8

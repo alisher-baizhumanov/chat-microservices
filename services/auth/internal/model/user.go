@@ -42,3 +42,10 @@ type UserClaims struct {
 	ID   int64
 	Role Role
 }
+
+type Credentials struct {
+	ID             int64
+	Email          string
+	HashedPassword []byte
+	Role           Role
+}

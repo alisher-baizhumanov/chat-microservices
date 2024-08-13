@@ -16,7 +16,7 @@ func (r *repository) CreateUser(ctx context.Context, userConverted model.UserCre
 	user := converter.UserCreateModelToData(userConverted)
 
 	sql, args, err := sq.Insert(tableUser).
-		Columns(columnName, columnEmail, columnHashedPassword, columndRole, columnCreatedAt, columnUpdatedAt).
+		Columns(columnName, columnEmail, columnHashedPassword, columnRole, columnCreatedAt, columnUpdatedAt).
 		Values(user.Name, user.Email, user.HashedPassword, user.Role, user.CreatedAt, user.CreatedAt).
 		Suffix("RETURNING " + columnID).
 		PlaceholderFormat(sq.Dollar).
