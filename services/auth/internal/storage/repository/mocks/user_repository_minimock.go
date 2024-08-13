@@ -32,6 +32,12 @@ type UserRepositoryMock struct {
 	beforeDeleteUserCounter uint64
 	DeleteUserMock          mUserRepositoryMockDeleteUser
 
+	funcGetCredentials          func(ctx context.Context, email string) (c2 model.Credentials, err error)
+	inspectFuncGetCredentials   func(ctx context.Context, email string)
+	afterGetCredentialsCounter  uint64
+	beforeGetCredentialsCounter uint64
+	GetCredentialsMock          mUserRepositoryMockGetCredentials
+
 	funcGetUser          func(ctx context.Context, id int64) (u1 model.User, err error)
 	inspectFuncGetUser   func(ctx context.Context, id int64)
 	afterGetUserCounter  uint64
@@ -58,6 +64,9 @@ func NewUserRepositoryMock(t minimock.Tester) *UserRepositoryMock {
 
 	m.DeleteUserMock = mUserRepositoryMockDeleteUser{mock: m}
 	m.DeleteUserMock.callArgs = []*UserRepositoryMockDeleteUserParams{}
+
+	m.GetCredentialsMock = mUserRepositoryMockGetCredentials{mock: m}
+	m.GetCredentialsMock.callArgs = []*UserRepositoryMockGetCredentialsParams{}
 
 	m.GetUserMock = mUserRepositoryMockGetUser{mock: m}
 	m.GetUserMock.callArgs = []*UserRepositoryMockGetUserParams{}
@@ -708,6 +717,327 @@ func (m *UserRepositoryMock) MinimockDeleteUserInspect() {
 	if !m.DeleteUserMock.invocationsDone() && afterDeleteUserCounter > 0 {
 		m.t.Errorf("Expected %d calls to UserRepositoryMock.DeleteUser but found %d calls",
 			mm_atomic.LoadUint64(&m.DeleteUserMock.expectedInvocations), afterDeleteUserCounter)
+	}
+}
+
+type mUserRepositoryMockGetCredentials struct {
+	optional           bool
+	mock               *UserRepositoryMock
+	defaultExpectation *UserRepositoryMockGetCredentialsExpectation
+	expectations       []*UserRepositoryMockGetCredentialsExpectation
+
+	callArgs []*UserRepositoryMockGetCredentialsParams
+	mutex    sync.RWMutex
+
+	expectedInvocations uint64
+}
+
+// UserRepositoryMockGetCredentialsExpectation specifies expectation struct of the UserRepository.GetCredentials
+type UserRepositoryMockGetCredentialsExpectation struct {
+	mock      *UserRepositoryMock
+	params    *UserRepositoryMockGetCredentialsParams
+	paramPtrs *UserRepositoryMockGetCredentialsParamPtrs
+	results   *UserRepositoryMockGetCredentialsResults
+	Counter   uint64
+}
+
+// UserRepositoryMockGetCredentialsParams contains parameters of the UserRepository.GetCredentials
+type UserRepositoryMockGetCredentialsParams struct {
+	ctx   context.Context
+	email string
+}
+
+// UserRepositoryMockGetCredentialsParamPtrs contains pointers to parameters of the UserRepository.GetCredentials
+type UserRepositoryMockGetCredentialsParamPtrs struct {
+	ctx   *context.Context
+	email *string
+}
+
+// UserRepositoryMockGetCredentialsResults contains results of the UserRepository.GetCredentials
+type UserRepositoryMockGetCredentialsResults struct {
+	c2  model.Credentials
+	err error
+}
+
+// Marks this method to be optional. The default behavior of any method with Return() is '1 or more', meaning
+// the test will fail minimock's automatic final call check if the mocked method was not called at least once.
+// Optional() makes method check to work in '0 or more' mode.
+// It is NOT RECOMMENDED to use this option unless you really need it, as default behaviour helps to
+// catch the problems when the expected method call is totally skipped during test run.
+func (mmGetCredentials *mUserRepositoryMockGetCredentials) Optional() *mUserRepositoryMockGetCredentials {
+	mmGetCredentials.optional = true
+	return mmGetCredentials
+}
+
+// Expect sets up expected params for UserRepository.GetCredentials
+func (mmGetCredentials *mUserRepositoryMockGetCredentials) Expect(ctx context.Context, email string) *mUserRepositoryMockGetCredentials {
+	if mmGetCredentials.mock.funcGetCredentials != nil {
+		mmGetCredentials.mock.t.Fatalf("UserRepositoryMock.GetCredentials mock is already set by Set")
+	}
+
+	if mmGetCredentials.defaultExpectation == nil {
+		mmGetCredentials.defaultExpectation = &UserRepositoryMockGetCredentialsExpectation{}
+	}
+
+	if mmGetCredentials.defaultExpectation.paramPtrs != nil {
+		mmGetCredentials.mock.t.Fatalf("UserRepositoryMock.GetCredentials mock is already set by ExpectParams functions")
+	}
+
+	mmGetCredentials.defaultExpectation.params = &UserRepositoryMockGetCredentialsParams{ctx, email}
+	for _, e := range mmGetCredentials.expectations {
+		if minimock.Equal(e.params, mmGetCredentials.defaultExpectation.params) {
+			mmGetCredentials.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmGetCredentials.defaultExpectation.params)
+		}
+	}
+
+	return mmGetCredentials
+}
+
+// ExpectCtxParam1 sets up expected param ctx for UserRepository.GetCredentials
+func (mmGetCredentials *mUserRepositoryMockGetCredentials) ExpectCtxParam1(ctx context.Context) *mUserRepositoryMockGetCredentials {
+	if mmGetCredentials.mock.funcGetCredentials != nil {
+		mmGetCredentials.mock.t.Fatalf("UserRepositoryMock.GetCredentials mock is already set by Set")
+	}
+
+	if mmGetCredentials.defaultExpectation == nil {
+		mmGetCredentials.defaultExpectation = &UserRepositoryMockGetCredentialsExpectation{}
+	}
+
+	if mmGetCredentials.defaultExpectation.params != nil {
+		mmGetCredentials.mock.t.Fatalf("UserRepositoryMock.GetCredentials mock is already set by Expect")
+	}
+
+	if mmGetCredentials.defaultExpectation.paramPtrs == nil {
+		mmGetCredentials.defaultExpectation.paramPtrs = &UserRepositoryMockGetCredentialsParamPtrs{}
+	}
+	mmGetCredentials.defaultExpectation.paramPtrs.ctx = &ctx
+
+	return mmGetCredentials
+}
+
+// ExpectEmailParam2 sets up expected param email for UserRepository.GetCredentials
+func (mmGetCredentials *mUserRepositoryMockGetCredentials) ExpectEmailParam2(email string) *mUserRepositoryMockGetCredentials {
+	if mmGetCredentials.mock.funcGetCredentials != nil {
+		mmGetCredentials.mock.t.Fatalf("UserRepositoryMock.GetCredentials mock is already set by Set")
+	}
+
+	if mmGetCredentials.defaultExpectation == nil {
+		mmGetCredentials.defaultExpectation = &UserRepositoryMockGetCredentialsExpectation{}
+	}
+
+	if mmGetCredentials.defaultExpectation.params != nil {
+		mmGetCredentials.mock.t.Fatalf("UserRepositoryMock.GetCredentials mock is already set by Expect")
+	}
+
+	if mmGetCredentials.defaultExpectation.paramPtrs == nil {
+		mmGetCredentials.defaultExpectation.paramPtrs = &UserRepositoryMockGetCredentialsParamPtrs{}
+	}
+	mmGetCredentials.defaultExpectation.paramPtrs.email = &email
+
+	return mmGetCredentials
+}
+
+// Inspect accepts an inspector function that has same arguments as the UserRepository.GetCredentials
+func (mmGetCredentials *mUserRepositoryMockGetCredentials) Inspect(f func(ctx context.Context, email string)) *mUserRepositoryMockGetCredentials {
+	if mmGetCredentials.mock.inspectFuncGetCredentials != nil {
+		mmGetCredentials.mock.t.Fatalf("Inspect function is already set for UserRepositoryMock.GetCredentials")
+	}
+
+	mmGetCredentials.mock.inspectFuncGetCredentials = f
+
+	return mmGetCredentials
+}
+
+// Return sets up results that will be returned by UserRepository.GetCredentials
+func (mmGetCredentials *mUserRepositoryMockGetCredentials) Return(c2 model.Credentials, err error) *UserRepositoryMock {
+	if mmGetCredentials.mock.funcGetCredentials != nil {
+		mmGetCredentials.mock.t.Fatalf("UserRepositoryMock.GetCredentials mock is already set by Set")
+	}
+
+	if mmGetCredentials.defaultExpectation == nil {
+		mmGetCredentials.defaultExpectation = &UserRepositoryMockGetCredentialsExpectation{mock: mmGetCredentials.mock}
+	}
+	mmGetCredentials.defaultExpectation.results = &UserRepositoryMockGetCredentialsResults{c2, err}
+	return mmGetCredentials.mock
+}
+
+// Set uses given function f to mock the UserRepository.GetCredentials method
+func (mmGetCredentials *mUserRepositoryMockGetCredentials) Set(f func(ctx context.Context, email string) (c2 model.Credentials, err error)) *UserRepositoryMock {
+	if mmGetCredentials.defaultExpectation != nil {
+		mmGetCredentials.mock.t.Fatalf("Default expectation is already set for the UserRepository.GetCredentials method")
+	}
+
+	if len(mmGetCredentials.expectations) > 0 {
+		mmGetCredentials.mock.t.Fatalf("Some expectations are already set for the UserRepository.GetCredentials method")
+	}
+
+	mmGetCredentials.mock.funcGetCredentials = f
+	return mmGetCredentials.mock
+}
+
+// When sets expectation for the UserRepository.GetCredentials which will trigger the result defined by the following
+// Then helper
+func (mmGetCredentials *mUserRepositoryMockGetCredentials) When(ctx context.Context, email string) *UserRepositoryMockGetCredentialsExpectation {
+	if mmGetCredentials.mock.funcGetCredentials != nil {
+		mmGetCredentials.mock.t.Fatalf("UserRepositoryMock.GetCredentials mock is already set by Set")
+	}
+
+	expectation := &UserRepositoryMockGetCredentialsExpectation{
+		mock:   mmGetCredentials.mock,
+		params: &UserRepositoryMockGetCredentialsParams{ctx, email},
+	}
+	mmGetCredentials.expectations = append(mmGetCredentials.expectations, expectation)
+	return expectation
+}
+
+// Then sets up UserRepository.GetCredentials return parameters for the expectation previously defined by the When method
+func (e *UserRepositoryMockGetCredentialsExpectation) Then(c2 model.Credentials, err error) *UserRepositoryMock {
+	e.results = &UserRepositoryMockGetCredentialsResults{c2, err}
+	return e.mock
+}
+
+// Times sets number of times UserRepository.GetCredentials should be invoked
+func (mmGetCredentials *mUserRepositoryMockGetCredentials) Times(n uint64) *mUserRepositoryMockGetCredentials {
+	if n == 0 {
+		mmGetCredentials.mock.t.Fatalf("Times of UserRepositoryMock.GetCredentials mock can not be zero")
+	}
+	mm_atomic.StoreUint64(&mmGetCredentials.expectedInvocations, n)
+	return mmGetCredentials
+}
+
+func (mmGetCredentials *mUserRepositoryMockGetCredentials) invocationsDone() bool {
+	if len(mmGetCredentials.expectations) == 0 && mmGetCredentials.defaultExpectation == nil && mmGetCredentials.mock.funcGetCredentials == nil {
+		return true
+	}
+
+	totalInvocations := mm_atomic.LoadUint64(&mmGetCredentials.mock.afterGetCredentialsCounter)
+	expectedInvocations := mm_atomic.LoadUint64(&mmGetCredentials.expectedInvocations)
+
+	return totalInvocations > 0 && (expectedInvocations == 0 || expectedInvocations == totalInvocations)
+}
+
+// GetCredentials implements repository.UserRepository
+func (mmGetCredentials *UserRepositoryMock) GetCredentials(ctx context.Context, email string) (c2 model.Credentials, err error) {
+	mm_atomic.AddUint64(&mmGetCredentials.beforeGetCredentialsCounter, 1)
+	defer mm_atomic.AddUint64(&mmGetCredentials.afterGetCredentialsCounter, 1)
+
+	if mmGetCredentials.inspectFuncGetCredentials != nil {
+		mmGetCredentials.inspectFuncGetCredentials(ctx, email)
+	}
+
+	mm_params := UserRepositoryMockGetCredentialsParams{ctx, email}
+
+	// Record call args
+	mmGetCredentials.GetCredentialsMock.mutex.Lock()
+	mmGetCredentials.GetCredentialsMock.callArgs = append(mmGetCredentials.GetCredentialsMock.callArgs, &mm_params)
+	mmGetCredentials.GetCredentialsMock.mutex.Unlock()
+
+	for _, e := range mmGetCredentials.GetCredentialsMock.expectations {
+		if minimock.Equal(*e.params, mm_params) {
+			mm_atomic.AddUint64(&e.Counter, 1)
+			return e.results.c2, e.results.err
+		}
+	}
+
+	if mmGetCredentials.GetCredentialsMock.defaultExpectation != nil {
+		mm_atomic.AddUint64(&mmGetCredentials.GetCredentialsMock.defaultExpectation.Counter, 1)
+		mm_want := mmGetCredentials.GetCredentialsMock.defaultExpectation.params
+		mm_want_ptrs := mmGetCredentials.GetCredentialsMock.defaultExpectation.paramPtrs
+
+		mm_got := UserRepositoryMockGetCredentialsParams{ctx, email}
+
+		if mm_want_ptrs != nil {
+
+			if mm_want_ptrs.ctx != nil && !minimock.Equal(*mm_want_ptrs.ctx, mm_got.ctx) {
+				mmGetCredentials.t.Errorf("UserRepositoryMock.GetCredentials got unexpected parameter ctx, want: %#v, got: %#v%s\n", *mm_want_ptrs.ctx, mm_got.ctx, minimock.Diff(*mm_want_ptrs.ctx, mm_got.ctx))
+			}
+
+			if mm_want_ptrs.email != nil && !minimock.Equal(*mm_want_ptrs.email, mm_got.email) {
+				mmGetCredentials.t.Errorf("UserRepositoryMock.GetCredentials got unexpected parameter email, want: %#v, got: %#v%s\n", *mm_want_ptrs.email, mm_got.email, minimock.Diff(*mm_want_ptrs.email, mm_got.email))
+			}
+
+		} else if mm_want != nil && !minimock.Equal(*mm_want, mm_got) {
+			mmGetCredentials.t.Errorf("UserRepositoryMock.GetCredentials got unexpected parameters, want: %#v, got: %#v%s\n", *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
+		}
+
+		mm_results := mmGetCredentials.GetCredentialsMock.defaultExpectation.results
+		if mm_results == nil {
+			mmGetCredentials.t.Fatal("No results are set for the UserRepositoryMock.GetCredentials")
+		}
+		return (*mm_results).c2, (*mm_results).err
+	}
+	if mmGetCredentials.funcGetCredentials != nil {
+		return mmGetCredentials.funcGetCredentials(ctx, email)
+	}
+	mmGetCredentials.t.Fatalf("Unexpected call to UserRepositoryMock.GetCredentials. %v %v", ctx, email)
+	return
+}
+
+// GetCredentialsAfterCounter returns a count of finished UserRepositoryMock.GetCredentials invocations
+func (mmGetCredentials *UserRepositoryMock) GetCredentialsAfterCounter() uint64 {
+	return mm_atomic.LoadUint64(&mmGetCredentials.afterGetCredentialsCounter)
+}
+
+// GetCredentialsBeforeCounter returns a count of UserRepositoryMock.GetCredentials invocations
+func (mmGetCredentials *UserRepositoryMock) GetCredentialsBeforeCounter() uint64 {
+	return mm_atomic.LoadUint64(&mmGetCredentials.beforeGetCredentialsCounter)
+}
+
+// Calls returns a list of arguments used in each call to UserRepositoryMock.GetCredentials.
+// The list is in the same order as the calls were made (i.e. recent calls have a higher index)
+func (mmGetCredentials *mUserRepositoryMockGetCredentials) Calls() []*UserRepositoryMockGetCredentialsParams {
+	mmGetCredentials.mutex.RLock()
+
+	argCopy := make([]*UserRepositoryMockGetCredentialsParams, len(mmGetCredentials.callArgs))
+	copy(argCopy, mmGetCredentials.callArgs)
+
+	mmGetCredentials.mutex.RUnlock()
+
+	return argCopy
+}
+
+// MinimockGetCredentialsDone returns true if the count of the GetCredentials invocations corresponds
+// the number of defined expectations
+func (m *UserRepositoryMock) MinimockGetCredentialsDone() bool {
+	if m.GetCredentialsMock.optional {
+		// Optional methods provide '0 or more' call count restriction.
+		return true
+	}
+
+	for _, e := range m.GetCredentialsMock.expectations {
+		if mm_atomic.LoadUint64(&e.Counter) < 1 {
+			return false
+		}
+	}
+
+	return m.GetCredentialsMock.invocationsDone()
+}
+
+// MinimockGetCredentialsInspect logs each unmet expectation
+func (m *UserRepositoryMock) MinimockGetCredentialsInspect() {
+	for _, e := range m.GetCredentialsMock.expectations {
+		if mm_atomic.LoadUint64(&e.Counter) < 1 {
+			m.t.Errorf("Expected call to UserRepositoryMock.GetCredentials with params: %#v", *e.params)
+		}
+	}
+
+	afterGetCredentialsCounter := mm_atomic.LoadUint64(&m.afterGetCredentialsCounter)
+	// if default expectation was set then invocations count should be greater than zero
+	if m.GetCredentialsMock.defaultExpectation != nil && afterGetCredentialsCounter < 1 {
+		if m.GetCredentialsMock.defaultExpectation.params == nil {
+			m.t.Error("Expected call to UserRepositoryMock.GetCredentials")
+		} else {
+			m.t.Errorf("Expected call to UserRepositoryMock.GetCredentials with params: %#v", *m.GetCredentialsMock.defaultExpectation.params)
+		}
+	}
+	// if func was set then invocations count should be greater than zero
+	if m.funcGetCredentials != nil && afterGetCredentialsCounter < 1 {
+		m.t.Error("Expected call to UserRepositoryMock.GetCredentials")
+	}
+
+	if !m.GetCredentialsMock.invocationsDone() && afterGetCredentialsCounter > 0 {
+		m.t.Errorf("Expected %d calls to UserRepositoryMock.GetCredentials but found %d calls",
+			mm_atomic.LoadUint64(&m.GetCredentialsMock.expectedInvocations), afterGetCredentialsCounter)
 	}
 }
 
@@ -1416,6 +1746,8 @@ func (m *UserRepositoryMock) MinimockFinish() {
 
 			m.MinimockDeleteUserInspect()
 
+			m.MinimockGetCredentialsInspect()
+
 			m.MinimockGetUserInspect()
 
 			m.MinimockUpdateUserInspect()
@@ -1444,6 +1776,7 @@ func (m *UserRepositoryMock) minimockDone() bool {
 	return done &&
 		m.MinimockCreateUserDone() &&
 		m.MinimockDeleteUserDone() &&
+		m.MinimockGetCredentialsDone() &&
 		m.MinimockGetUserDone() &&
 		m.MinimockUpdateUserDone()
 }

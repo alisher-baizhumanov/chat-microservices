@@ -16,6 +16,7 @@ type jwtTokenManager struct {
 	ttlRefreshKey    time.Duration
 }
 
+// New creates a new instance of the JWT token manager.
 func New(secretAccessKey, secretRefreshKey []byte, ttlAccessKey, ttlRefreshKey time.Duration) jwtInterface.TokenManager {
 	return &jwtTokenManager{
 		signingMethod:    jwt.SigningMethodHS256,

@@ -2,7 +2,6 @@ package auth
 
 import "context"
 
-func (s *service) GetRefreshToken(ctx context.Context, refreshToken string) (string, error) {
-	//TODO implement me
-	panic("implement me")
+func (s *service) GetRefreshToken(_ context.Context, refreshToken string) (string, error) {
+	return s.tokenManager.RegenerateRefreshToken(refreshToken)
 }

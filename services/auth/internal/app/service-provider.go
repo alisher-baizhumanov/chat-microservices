@@ -2,8 +2,6 @@ package app
 
 import (
 	"context"
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/utils/jwt"
-	token_manager "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/utils/jwt/token-manager"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 
@@ -24,6 +22,8 @@ import (
 	userRepository "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/user"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/utils/hasher"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/utils/hasher/argon2id"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/utils/jwt"
+	tokenmanager "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/utils/jwt/token-manager"
 )
 
 type serviceProvider struct {
@@ -96,7 +96,7 @@ func (s *serviceProvider) getPasswordHasher() hasher.PasswordHasher {
 
 func (s *serviceProvider) getTokenManager() jwt.TokenManager {
 	if s.tokenManager == nil {
-		s.tokenManager = token_manager.New(
+		s.tokenManager = tokenmanager.New(
 			s.getConfig().AccessSecretKey,
 			s.getConfig().RefreshSecretKey,
 			s.getConfig().AccessTokenTTL,
@@ -144,7 +144,7 @@ func (s *serviceProvider) getUserHandlers() *grpcHandler.UserHandlers {
 func (s *serviceProvider) getAuthHandlers() *grpcHandler.AuthHandlers {
 	if s.authHandlers == nil {
 		s.authHandlers = grpcHandler.NewAuthHandlers(
-			s.authService,
+			s.getAuthService(),
 		)
 	}
 

@@ -38,11 +38,13 @@ type UserCreate struct {
 	CreatedAt      time.Time
 }
 
+// UserClaims represents the claims in a JWT token for a user.
 type UserClaims struct {
 	ID   int64
 	Role Role
 }
 
+// Credentials represents the data required to authenticate user.
 type Credentials struct {
 	ID             int64
 	Email          string

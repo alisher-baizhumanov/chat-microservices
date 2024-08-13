@@ -9,6 +9,7 @@ import (
 	jwtModel "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/utils/jwt/token-manager/model"
 )
 
+// UserClaimsModelToJWT converts user claims model to JWT claims.
 func UserClaimsModelToJWT(userClaims model.UserClaims, expiresAt time.Time) jwtModel.UserJWTClaims {
 	claims := jwtModel.UserJWTClaims{
 		ID:   userClaims.ID,
@@ -20,6 +21,7 @@ func UserClaimsModelToJWT(userClaims model.UserClaims, expiresAt time.Time) jwtM
 	return claims
 }
 
+// UserClaimsJWTToModel converts user claims JWT to model.
 func UserClaimsJWTToModel(userClaims jwtModel.UserJWTClaims) model.UserClaims {
 	return model.UserClaims{
 		ID:   userClaims.ID,
