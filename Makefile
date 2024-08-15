@@ -105,10 +105,10 @@ up:
 	make up-chat
 
 up-auth:
-	docker-compose up auth --build --detach
+	docker-compose up --build --detach auth
 
 up-chat:
-	docker compose up chat-server --build --detach
+	docker compose up --build --detach chat-server
 
 stop:
 	docker-compose stop

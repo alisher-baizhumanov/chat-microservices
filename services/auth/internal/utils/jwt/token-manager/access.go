@@ -12,7 +12,7 @@ func (j *jwtTokenManager) GenerateAccessToken(refreshToken string) (string, erro
 		return "", err
 	}
 
-	expiresAt := time.Now().Add(j.ttlRefreshKey)
+	expiresAt := time.Now().Add(j.ttlAccessKey)
 
 	claims.ExpiresAt = &jwt.NumericDate{Time: expiresAt}
 

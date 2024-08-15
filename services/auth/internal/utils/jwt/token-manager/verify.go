@@ -2,8 +2,6 @@ package token_manager
 
 import (
 	"fmt"
-	"time"
-
 	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
@@ -21,7 +19,7 @@ func (j *jwtTokenManager) Verify(accessToken string) (model.UserClaims, error) {
 }
 
 func parseToken(tokenString string, secretKey []byte) (*jwtModel.UserJWTClaims, error) {
-	token, err := jwt.Parse(tokenString, func(_ *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwtModel.UserJWTClaims{}, func(_ *jwt.Token) (interface{}, error) {
 		return secretKey, nil
 	})
 
@@ -32,10 +30,6 @@ func parseToken(tokenString string, secretKey []byte) (*jwtModel.UserJWTClaims, 
 	claims, ok := token.Claims.(*jwtModel.UserJWTClaims)
 	if !ok {
 		return nil, fmt.Errorf("%w, message: can not be conberted to custom", model.ErrInvalidToken)
-	}
-
-	if claims.ExpiresAt.Before(time.Now()) {
-		return nil, fmt.Errorf("%w, message: expired token", model.ErrInvalidToken)
 	}
 
 	return claims, nil

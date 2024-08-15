@@ -23,8 +23,8 @@ type Config struct {
 
 	AccessTokenTTL   time.Duration `env:"ACCESS_TOKEN_TTL,required"`
 	RefreshTokenTTL  time.Duration `env:"REFRESH_TOKEN_TTL,required"`
-	AccessSecretKey  []byte        `env:"ACCESS_SECRET_KEY,required"`
-	RefreshSecretKey []byte        `env:"REFRESH_SECRET_KEY,required"`
+	AccessSecretKey  string        `env:"ACCESS_SECRET_KEY,required"`
+	RefreshSecretKey string        `env:"REFRESH_SECRET_KEY,required"`
 }
 
 // GRPCAddress returns the gRPC server address in the format "host:port".

@@ -49,7 +49,7 @@ func (r *repository) GetUser(ctx context.Context, id int64) (model.User, error) 
 
 // GetCredentials retrieves a user credentials from the repository based on the provided user ID.
 func (r *repository) GetCredentials(ctx context.Context, email string) (model.Credentials, error) {
-	sql, args, err := sq.Select(columnEmail, columnRole, columnHashedPassword).
+	sql, args, err := sq.Select(columnID, columnRole, columnHashedPassword).
 		From(tableUser).
 		Where(sq.Eq{columnEmail: email}).
 		PlaceholderFormat(sq.Dollar).

@@ -31,7 +31,7 @@ func ErrorModelToProto(err error) error {
 		return status.Error(codes.InvalidArgument, "invalid email or password")
 
 	case errors.Is(err, model.ErrInvalidToken):
-		return status.Error(codes.Unauthenticated, "invalid token")
+		return status.Error(codes.Unauthenticated, message)
 
 	case errors.Is(err, model.ErrNotFound):
 		return status.Error(codes.NotFound, "")

@@ -97,8 +97,8 @@ func (s *serviceProvider) getPasswordHasher() hasher.PasswordHasher {
 func (s *serviceProvider) getTokenManager() jwt.TokenManager {
 	if s.tokenManager == nil {
 		s.tokenManager = tokenmanager.New(
-			s.getConfig().AccessSecretKey,
-			s.getConfig().RefreshSecretKey,
+			[]byte(s.getConfig().AccessSecretKey),
+			[]byte(s.getConfig().RefreshSecretKey),
 			s.getConfig().AccessTokenTTL,
 			s.getConfig().RefreshTokenTTL,
 		)
