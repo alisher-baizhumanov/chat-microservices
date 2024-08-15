@@ -3,16 +3,36 @@ syntax = "proto3";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
+import "validate/validate.proto";
 
 package user_v1;
 
 option go_package = "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1;user_v1";
 
 service UserServiceV1 {
-    rpc Create(CreateIn) returns (CreateOut) {}
-    rpc Get(GetIn) returns (GetOut) {}
-    rpc Update(UpdateIn) returns (google.protobuf.Empty) {}
-    rpc Delete(DeleteIn) returns (google.protobuf.Empty) {}
+    rpc Create(CreateIn) returns (CreateOut) {
+        option (google.api.http) = {
+            post: "/auth/v1/users"
+            body: "user_register"
+        };
+    }
+    rpc Get(GetIn) returns (GetOut) {
+        option (google.api.http) = {
+            get: "/auth/v1/users/{id}"
+        };
+    }
+    rpc Update(UpdateIn) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            patch: "/auth/v1/users/{id}"
+            body: "user_update"
+        };
+    }
+    rpc Delete(DeleteIn) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/auth/v1/users/{id}"
+        };
+    }
 }
 
 enum Role {
@@ -22,16 +42,16 @@ enum Role {
 }
 
 message UserRegister {
-    string name = 1;
-    string email = 2;
-    string password = 3;
-    string password_confirm = 4;
-    Role role = 5;
+    string name = 1 [(validate.rules).string = {min_len: 3, max_len: 256}];
+    string email = 2 [(validate.rules).string.email = true];
+    string password = 3 [(validate.rules).string = {min_len: 8, max_len: 256}];
+    string password_confirm = 4 [(validate.rules).string = {min_len: 8, max_len: 256}];
+    Role role = 5 [(validate.rules).enum = {defined_only: true}];
 }
 
 message UserUpdate {
-    google.protobuf.StringValue name = 1;
-    google.protobuf.StringValue email = 2;
+    google.protobuf.StringValue name = 1 [(validate.rules).string = {min_len: 3, max_len: 256}];
+    google.protobuf.StringValue email = 2 [(validate.rules).string.email = true];
     Role role = 3;
 }
 
@@ -45,7 +65,7 @@ message UserInfo {
 }
 
 message CreateIn {
-    UserRegister user_register = 1;
+    UserRegister user_register = 1 [(validate.rules).message.required = true];
 }
 
 message CreateOut {
@@ -53,7 +73,7 @@ message CreateOut {
 }
 
 message GetIn {
-    int64 id = 1;
+    int64 id = 1 [(validate.rules).int64.gt = 0];
 }
 
 message GetOut {
@@ -61,10 +81,10 @@ message GetOut {
 }
 
 message UpdateIn {
-    int64 id = 1;
-    UserUpdate user_update = 2;
+    int64 id = 1 [(validate.rules).int64.gt = 0];
+    UserUpdate user_update = 2 [(validate.rules).message.required = true];
 }
 
 message DeleteIn {
-    int64 id = 1;
+    int64 id = 1 [(validate.rules).int64.gt = 0];
 }

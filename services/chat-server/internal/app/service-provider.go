@@ -1,8 +1,16 @@
 package app
 
 import (
+	"context"
+
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo"
-	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/api/grpc"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
+	httpLibrary "github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
+	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/chat-v1"
+	grpcHandler "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/api/grpc"
+	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/config"
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/service"
 	chatService "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/service/chat"
 	messageService "github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/service/message"
@@ -17,11 +25,16 @@ type serviceProvider struct {
 	messageRepository repository.MessageRepository
 	chatService       service.ChatService
 	messageService    service.MessageService
-	gRPCServer        *grpc.ServerHandlers
+	gRPCHandlers      *grpcHandler.ServerHandlers
+	cfg               *config.Config
 }
 
-func newServiceProvider(mongoClient mongo.Client) serviceProvider {
-	return serviceProvider{mongoDatabase: mongoClient}
+func newServiceProvider(mongoClient mongo.Client, cfg *config.Config) serviceProvider {
+	return serviceProvider{mongoDatabase: mongoClient, cfg: cfg}
+}
+
+func (s *serviceProvider) getConfig() *config.Config {
+	return s.cfg
 }
 
 func (s *serviceProvider) getMongoDatabase() mongo.Client {
@@ -73,13 +86,39 @@ func (s *serviceProvider) getMessageService() service.MessageService {
 	return s.messageService
 }
 
-func (s *serviceProvider) getServerHandlers() *grpc.ServerHandlers {
-	if s.gRPCServer == nil {
-		s.gRPCServer = grpc.New(
+func (s *serviceProvider) getGRPCHandlers() *grpcHandler.ServerHandlers {
+	if s.gRPCHandlers == nil {
+		s.gRPCHandlers = grpcHandler.New(
 			s.getChatService(),
 			s.getMessageService(),
 		)
 	}
 
-	return s.gRPCServer
+	return s.gRPCHandlers
+}
+
+func (s *serviceProvider) getGRPCServer() (*grpc.Server, error) {
+	return grpc.NewGRPCServer(
+		s.getConfig().GRPCServerPort,
+		&desc.ChatServiceV1_ServiceDesc,
+		s.getGRPCHandlers(),
+	)
+}
+
+func (s *serviceProvider) getHTTPserver(ctx context.Context) (*httpLibrary.Server, error) {
+	mux := runtime.NewServeMux()
+
+	if err := desc.RegisterChatServiceV1HandlerFromEndpoint(
+		ctx,
+		mux,
+		s.getConfig().GRPCAddress(),
+		s.getConfig().GRPCDialOptions(),
+	); err != nil {
+		return nil, err
+	}
+
+	return httpLibrary.NewHTTPServer(
+		s.getConfig().HTTPServerPort,
+		mux,
+	), nil
 }

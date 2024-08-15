@@ -1,6 +1,7 @@
 bin
 .github
 .idea
+vendor.protogen
 .golangci.pipeline.yaml
 .gitignore
 docker-compose.yml
