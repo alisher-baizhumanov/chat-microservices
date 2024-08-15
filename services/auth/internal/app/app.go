@@ -10,14 +10,15 @@ import (
 	pg "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres/pg"
 	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
-	desc "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1"
+	http "github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/config"
 )
 
 // App represents the application with its services and gRPC server.
 type App struct {
 	cfg         *config.Config
-	server      *grpc.Server
+	grpcServer  *grpc.Server
+	httpServer  *http.Server
 	dbClient    db.Client
 	cacheClient cache.Client
 }
@@ -29,46 +30,59 @@ func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
 		return nil, err
 	}
 
-	if err = dbClient.DB().Ping(ctx); err != nil {
-		return nil, err
-	}
-
 	cacheClient := redis.NewClient(cfg.CacheDSN)
-	if err = cacheClient.Ping(ctx); err != nil {
+
+	services := newServiceProvider(dbClient, cacheClient, cfg)
+
+	grpcServer, err := services.getGRPCServer()
+	if err != nil {
 		return nil, err
 	}
 
-	services := newServiceProvider(dbClient, cacheClient, cfg.CacheTTL)
-
-	gRPCHandlers := services.getGRPCServerHandlers()
-
-	server, err := grpc.NewGRPCServer(cfg.GRPCServerPort, &desc.UserServiceV1_ServiceDesc, gRPCHandlers)
+	httpServer, err := services.getHTTPServer(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	return &App{
 		cfg:         cfg,
-		server:      server,
+		grpcServer:  grpcServer,
 		dbClient:    dbClient,
 		cacheClient: cacheClient,
+		httpServer:  httpServer,
 	}, nil
 }
 
 // Run starts the gRPC server and waits for a termination signal to gracefully shut down the server.
 func (a *App) Run(ctx context.Context) (err error) {
+	if err = a.dbClient.DB().Ping(ctx); err != nil {
+		return err
+	}
 	defer a.dbClient.DB().Close()
 
+	if err = a.cacheClient.Ping(ctx); err != nil {
+		return err
+	}
 	defer func() {
 		if errClose := a.cacheClient.Close(ctx); errClose != nil {
 			err = errClose
 		}
 	}()
 
-	a.server.Start()
-	defer a.server.Stop()
+	a.grpcServer.Start()
+	defer a.grpcServer.Stop()
 	slog.Info("Starting gRPC Server",
 		slog.Int("port", a.cfg.GRPCServerPort),
+	)
+
+	a.httpServer.Start()
+	defer func() {
+		if errClose := a.httpServer.Stop(ctx); errClose != nil {
+			err = errClose
+		}
+	}()
+	slog.Info("Starting HTTP Server",
+		slog.Int("port", a.cfg.HTTPServerPort),
 	)
 
 	stop := gracefulshutdown.WaitSignal()

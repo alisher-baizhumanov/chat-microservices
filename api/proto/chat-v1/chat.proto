@@ -1,24 +1,40 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "validate/validate.proto";
 
 package chat_v1;
 
 option go_package = "github.com/alisher-baizhumanov/chat-microservices/protos/generated/chat-v1;chat_v1";
 
 service ChatServiceV1 {
-  rpc CreateChat(CreateChatIn) returns (CreateChatOut) {}
-  rpc DeleteChat(DeleteChatIn) returns (google.protobuf.Empty) {}
-  rpc SendMessage(SendMessageIn) returns (SendMessageOut) {}
+  rpc CreateChat(CreateChatIn) returns (CreateChatOut) {
+    option (google.api.http) = {
+      post: "/chat-server/v1/chats"
+      body: "chat"
+    };
+  }
+  rpc DeleteChat(DeleteChatIn) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/chat-server/v1/chats/{id}"
+    };
+  }
+  rpc SendMessage(SendMessageIn) returns (SendMessageOut) {
+    option (google.api.http) = {
+      post: "/chat-server/v1/messages"
+      body: "message"
+    };
+  }
 }
 
 message CreateChatIn {
-  ChatCreate chat = 1;
+  ChatCreate chat = 1 [(validate.rules).message.required = true];
 }
 
 message ChatCreate {
-  string name = 1;
-  repeated int64 user_id_list = 2;
+  string name = 1 [(validate.rules).string = {min_len: 3, max_len: 256}];
+  repeated int64 user_id_list = 2 [(validate.rules).repeated = {min_items: 1}];
 }
 
 message CreateChatOut {
@@ -26,17 +42,17 @@ message CreateChatOut {
 }
 
 message DeleteChatIn {
-  string id = 1;
+  string id = 1 [(validate.rules).string.min_len = 1];
 }
 
 message SendMessageIn {
-  MessageCreate message = 1;
+  MessageCreate message = 1 [(validate.rules).message.required = true];
 }
 
 message MessageCreate {
-  string chat_id = 1;
-  int64 user_id = 2;
-  string text = 3;
+  string chat_id = 1 [(validate.rules).string.min_len = 1];
+  int64 user_id = 2 [(validate.rules).int64.gt = 0];
+  string text = 3 [(validate.rules).string.min_len = 1];
 }
 
 message SendMessageOut {
