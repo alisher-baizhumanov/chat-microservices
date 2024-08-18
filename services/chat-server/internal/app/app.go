@@ -80,7 +80,7 @@ func (a *App) Run(ctx context.Context) (err error) {
 
 	a.grpcServer.Start()
 	defer a.grpcServer.Stop()
-	slog.Info("Starting gRPC Server",
+	logger.Info("Starting gRPC Server",
 		slog.Int("port", a.cfg.GRPCServerPort),
 	)
 
@@ -90,12 +90,12 @@ func (a *App) Run(ctx context.Context) (err error) {
 			err = errClose
 		}
 	}()
-	slog.Info("Starting HTTP Server",
+	logger.Info("Starting HTTP Server",
 		slog.Int("port", a.cfg.HTTPServerPort),
 	)
 
 	stop := gracefulshutdown.WaitSignal()
-	slog.Info("Stop application", slog.String("signal", stop.String()))
+	logger.Info("Stop application", slog.String("signal", stop.String()))
 
 	return nil
 }

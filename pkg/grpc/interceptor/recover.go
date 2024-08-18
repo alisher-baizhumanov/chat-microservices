@@ -14,7 +14,7 @@ import (
 func Recover(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (result any, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			logger.Warn("recovered from panic",
+			logger.Error("recovered from panic",
 				slog.String("error", fmt.Sprintf("%v", r)),
 				slog.String("method", info.FullMethod),
 			)

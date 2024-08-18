@@ -2,9 +2,10 @@ package user
 
 import (
 	"context"
-	"log/slog"
+	"errors"
 	"time"
 
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/logger"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 )
 
@@ -12,16 +13,25 @@ import (
 // It delegates the update operation to the user repository and returns an error, if any.
 func (s *service) UpdateUserFields(ctx context.Context, id int64, userUpdate model.UserUpdateOptions) error {
 	if err := s.userCache.Delete(ctx, id); err != nil {
-		slog.ErrorContext(ctx, "not deleted user in cache",
-			slog.String("error", err.Error()),
-			slog.Int64("id", id),
+		logger.Warn("not deleted user in cache",
+			logger.String("error", err.Error()),
+			logger.Int64("id", id),
 		)
 	}
 
-	return s.userRepository.UpdateUser(
-		ctx,
-		id,
-		userUpdate,
-		time.Now(),
-	)
+	if err := s.userRepository.UpdateUser(ctx, id, userUpdate, time.Now()); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			logger.Info("user not found", logger.Int64("id", id))
+		} else {
+			logger.Warn("not updated user in database",
+				logger.String("error", err.Error()),
+				logger.Int64("id", id),
+			)
+		}
+
+		return err
+	}
+
+	logger.Info("user updated", logger.Int64("id", id))
+	return nil
 }
