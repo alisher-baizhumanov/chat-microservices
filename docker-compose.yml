@@ -51,12 +51,16 @@ services:
       - "55051:55051"
       - "55052:55052"
     environment:
+      - "ENVIRONMENT=${ENVIRONMENT}"
+
       - "GRPC_SERVER_HOST=localhost"
       - "GRPC_SERVER_PORT=55051"
       - "HTTP_SERVER_PORT=55052"
+
       - "DB_DSN=${POSTGRES_DB_DSN}"
       - "CACHE_DSN=${REDIS_DSN}"
       - "CACHE_TTL=${REDIS_TTL}"
+
       - "ACCESS_TOKEN_TTL=${ACCESS_TOKEN_TTL}"
       - "REFRESH_TOKEN_TTL=${REFRESH_TOKEN_TTL}"
       - "ACCESS_SECRET_KEY=${ACCESS_SECRET_KEY}"
@@ -91,9 +95,12 @@ services:
       - "55054:55054"
       - "55055:55055"
     environment:
+      - "ENVIRONMENT=${ENVIRONMENT}"
+
       - "GRPC_SERVER_HOST=localhost"
       - "GRPC_SERVER_PORT=55054"
       - "HTTP_SERVER_PORT=55055"
+
       - "DB_DSN=${MONGO_DB_DSN}"
       - "DATABASE=${MONGO_DATABASE_NAME}"
     restart: unless-stopped

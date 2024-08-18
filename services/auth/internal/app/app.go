@@ -7,10 +7,11 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/cache"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/cache/redis"
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
-	pg "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres/pg"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres/pg"
 	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
-	http "github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/logger"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/config"
 )
 
@@ -24,7 +25,16 @@ type App struct {
 }
 
 // NewApp creates and initializes a new App instance.
-func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
+func NewApp(ctx context.Context) (*App, error) {
+	cfg, err := config.Load()
+	if err != nil {
+		return nil, err
+	}
+
+	if err = logger.Init(logger.LogEnvironment(cfg.Env)); err != nil {
+		return nil, err
+	}
+
 	dbClient, err := pg.New(ctx, cfg.DatabaseDSN)
 	if err != nil {
 		return nil, err
@@ -55,6 +65,12 @@ func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
 
 // Run starts the gRPC server and waits for a termination signal to gracefully shut down the server.
 func (a *App) Run(ctx context.Context) (err error) {
+	defer func() {
+		if errLogger := logger.Close(); errLogger != nil {
+			err = errLogger
+		}
+	}()
+
 	if err = a.dbClient.DB().Ping(ctx); err != nil {
 		return err
 	}

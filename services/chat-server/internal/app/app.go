@@ -8,7 +8,8 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo/mg"
 	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
-	http "github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/logger"
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/config"
 )
 
@@ -21,7 +22,16 @@ type App struct {
 }
 
 // NewApp creates and initializes a new App instance.
-func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
+func NewApp(ctx context.Context) (*App, error) {
+	cfg, err := config.Load()
+	if err != nil {
+		return nil, err
+	}
+
+	if err = logger.Init(logger.LogEnvironment(cfg.Env)); err != nil {
+		return nil, err
+	}
+
 	client, err := mg.NewClient(ctx, cfg.DSN, cfg.Database)
 	if err != nil {
 		return nil, err
@@ -53,6 +63,12 @@ func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
 
 // Run starts the gRPC server and waits for a termination signal to gracefully shut down the server.
 func (a *App) Run(ctx context.Context) (err error) {
+	defer func() {
+		if errLogger := logger.Close(); errLogger != nil {
+			err = errLogger
+		}
+	}()
+
 	if err = a.client.Ping(ctx); err != nil {
 		return err
 	}

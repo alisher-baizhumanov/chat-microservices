@@ -11,6 +11,7 @@ import (
 
 	postgres "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres/prettier"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/logger"
 )
 
 type key string
@@ -53,7 +54,7 @@ func (p *pg) ScanAll(ctx context.Context, dest any, q postgres.Query, args ...an
 
 // Exec executes a query without returning any rows.
 func (p *pg) Exec(ctx context.Context, q postgres.Query, args ...any) (pgconn.CommandTag, error) {
-	logQuery(ctx, q, args...)
+	logQuery(q, args...)
 
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
 	if ok {
@@ -65,7 +66,7 @@ func (p *pg) Exec(ctx context.Context, q postgres.Query, args ...any) (pgconn.Co
 
 // Query executes a query and returns the resulting rows.
 func (p *pg) Query(ctx context.Context, q postgres.Query, args ...any) (pgx.Rows, error) {
-	logQuery(ctx, q, args...)
+	logQuery(q, args...)
 
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
 	if ok {
@@ -77,7 +78,7 @@ func (p *pg) Query(ctx context.Context, q postgres.Query, args ...any) (pgx.Rows
 
 // QueryRow executes a query and returns a single row.
 func (p *pg) QueryRow(ctx context.Context, q postgres.Query, args ...any) pgx.Row {
-	logQuery(ctx, q, args...)
+	logQuery(q, args...)
 
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
 	if ok {
@@ -107,13 +108,12 @@ func MakeContextTx(ctx context.Context, tx pgx.Tx) context.Context {
 	return context.WithValue(ctx, TxKey, tx)
 }
 
-func logQuery(ctx context.Context, q postgres.Query, args ...any) {
-	if slog.Default().Enabled(ctx, slog.LevelDebug) {
+func logQuery(q postgres.Query, args ...any) {
+	if logger.IsDebugEnabled() {
 		prettyQuery := prettier.Pretty(q.QueryRaw, prettier.PlaceholderDollar, args...)
 
-		slog.DebugContext(
-			ctx,
-			"sql",
+		logger.Debug("sql",
+			slog.String("query_name", q.Name),
 			slog.String("query", prettyQuery),
 		)
 	}

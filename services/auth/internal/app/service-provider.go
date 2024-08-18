@@ -174,7 +174,7 @@ func (s *serviceProvider) getHTTPServer(ctx context.Context) (*httpLibrary.Serve
 		ctx,
 		mux,
 		s.getConfig().GRPCAddress(),
-		s.getConfig().GRPCDialOptions(),
+		s.getConfig().GRPCClientDialOptions(),
 	); err != nil {
 		return nil, err
 	}
@@ -183,7 +183,7 @@ func (s *serviceProvider) getHTTPServer(ctx context.Context) (*httpLibrary.Serve
 		ctx,
 		mux,
 		s.getConfig().GRPCAddress(),
-		s.getConfig().GRPCDialOptions(),
+		s.getConfig().GRPCClientDialOptions(),
 	); err != nil {
 		return nil, err
 	}
