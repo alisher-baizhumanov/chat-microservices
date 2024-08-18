@@ -8,7 +8,7 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo/mg"
 	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
-	"github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc/http-gateway"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/logger"
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/config"
 )

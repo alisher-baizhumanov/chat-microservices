@@ -3,6 +3,8 @@ package grpc
 import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc/interceptor"
 )
 
 // DefaultOptions is a set of default gRPC server options that include:
@@ -11,6 +13,10 @@ import (
 var (
 	DefaultOptions = []grpc.ServerOption{
 		grpc.Creds(insecure.NewCredentials()),
-		grpc.UnaryInterceptor(ValidateInterceptor),
+		grpc.ChainUnaryInterceptor(
+			interceptor.Recover,
+			interceptor.Logger,
+			interceptor.ValidateGRPC,
+		),
 	}
 )

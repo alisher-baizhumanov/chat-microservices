@@ -8,7 +8,7 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/cache"
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
 	grpcLibrary "github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
-	httpLibrary "github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
+	httpLibrary "github.com/alisher-baizhumanov/chat-microservices/pkg/grpc/http-gateway"
 	descAuth "github.com/alisher-baizhumanov/chat-microservices/protos/generated/auth-v1"
 	descUser "github.com/alisher-baizhumanov/chat-microservices/protos/generated/user-v1"
 	grpcHandler "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/api/grpc"

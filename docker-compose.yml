@@ -66,6 +66,8 @@ services:
       - "ACCESS_SECRET_KEY=${ACCESS_SECRET_KEY}"
       - "REFRESH_SECRET_KEY=${REFRESH_SECRET_KEY}"
     restart: unless-stopped
+    volumes:
+      - ./logs/auth:/logs
     networks:
       - inter-service-network
 
@@ -104,6 +106,8 @@ services:
       - "DB_DSN=${MONGO_DB_DSN}"
       - "DATABASE=${MONGO_DATABASE_NAME}"
     restart: unless-stopped
+    volumes:
+      - ./logs/chat-server:/logs
     networks:
       - inter-service-network
 
