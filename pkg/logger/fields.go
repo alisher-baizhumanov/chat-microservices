@@ -22,3 +22,20 @@ func Int64(key string, value int64) Field {
 func Duration(key string, value time.Duration) Field {
 	return Field(slog.Duration(key, value))
 }
+
+func Any(key string, value any) Field {
+	return Field(slog.Any(key, value))
+}
+
+func convertFields(fields []Field) []any {
+	if len(fields) == 0 {
+		return nil
+	}
+
+	attrs := make([]any, len(fields))
+	for i := range fields {
+		attrs[i] = slog.Attr(fields[i])
+	}
+
+	return attrs
+}

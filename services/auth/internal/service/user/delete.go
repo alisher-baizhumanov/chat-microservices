@@ -7,6 +7,9 @@ import (
 
 // DeleteByID removes a user from the system identified by their unique identifier.
 func (s *service) DeleteByID(ctx context.Context, id int64) error {
+	// todo: delet
+	logger.Info("cool message")
+
 	if err := s.userCache.Delete(ctx, id); err != nil {
 		logger.Warn("not deleted user in cache",
 			logger.String("error", err.Error()),

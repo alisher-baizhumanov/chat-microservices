@@ -3,9 +3,9 @@ package interceptor
 import (
 	"context"
 	"fmt"
-	"log/slog"
-
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/logger"
 )
@@ -15,13 +15,13 @@ func Recover(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler g
 	defer func() {
 		if r := recover(); r != nil {
 			logger.Error("recovered from panic",
-				slog.String("error", fmt.Sprintf("%v", r)),
-				slog.String("method", info.FullMethod),
+				logger.String("error", fmt.Sprintf("%v", r)),
+				logger.String("method", info.FullMethod),
 			)
-		}
 
-		//result = nil
-		//err = status.Error(codes.Internal, "internal server error")
+			result = nil
+			err = status.Error(codes.Internal, "")
+		}
 	}()
 
 	return handler(ctx, req)
