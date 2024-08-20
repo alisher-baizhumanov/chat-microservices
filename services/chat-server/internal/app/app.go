@@ -9,15 +9,19 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc/http-gateway"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/logger"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/metrics"
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/config"
 )
 
 // App represents the application with its services and gRPC server.
 type App struct {
-	cfg        *config.Config
-	grpcServer *grpc.Server
-	httpServer *http.Server
-	client     mongo.Client
+	cfg *config.Config
+
+	grpcServer    *grpc.Server
+	httpServer    *http.Server
+	metricsServer *metrics.Server
+
+	client mongo.Client
 }
 
 // NewApp creates and initializes a new App instance.
@@ -52,46 +56,50 @@ func NewApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
+	metrics.NewMetricsServer()
+
 	return &App{
-		cfg:        cfg,
-		grpcServer: grpcServer,
-		httpServer: httpServer,
-		client:     client,
+		cfg:           cfg,
+		grpcServer:    grpcServer,
+		httpServer:    httpServer,
+		metricsServer: metrics.NewMetricsServer(),
+		client:        client,
 	}, nil
 }
 
 // Run starts the gRPC server and waits for a termination signal to gracefully shut down the server.
-func (a *App) Run(ctx context.Context) (err error) {
+func (a *App) Run(ctx context.Context) error {
 	defer func() {
-		if errLogger := logger.Close(); errLogger != nil {
-			err = errLogger
-		}
+		_ = logger.Close()
 	}()
 
-	if err = a.client.Ping(ctx); err != nil {
+	if err := a.client.Ping(ctx); err != nil {
 		return err
 	}
 	defer func() {
 		if errClose := a.client.Close(ctx); errClose != nil {
-			err = errClose
+			logger.Error("closing mongo client", logger.String("error", errClose.Error()))
+		}
+	}()
+
+	a.metricsServer.Start()
+	defer func() {
+		if errClose := a.metricsServer.Stop(ctx); errClose != nil {
+			logger.Error("closing metrics server", logger.String("error", errClose.Error()))
 		}
 	}()
 
 	a.grpcServer.Start()
 	defer a.grpcServer.Stop()
-	logger.Info("Starting gRPC Server",
-		logger.Int("port", a.cfg.GRPCServerPort),
-	)
+	logger.Info("Starting gRPC Server", logger.Int("port", a.cfg.GRPCServerPort))
 
 	a.httpServer.Start()
 	defer func() {
 		if errClose := a.httpServer.Stop(ctx); errClose != nil {
-			err = errClose
+			logger.Error("closing metrics server", logger.String("error", errClose.Error()))
 		}
 	}()
-	logger.Info("Starting HTTP Server",
-		logger.Int("port", a.cfg.HTTPServerPort),
-	)
+	logger.Info("Starting HTTP Server", logger.Int("port", a.cfg.HTTPServerPort))
 
 	stop := gracefulshutdown.WaitSignal()
 	logger.Info("Stop application", logger.String("signal", stop.String()))

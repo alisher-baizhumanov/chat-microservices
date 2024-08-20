@@ -16,9 +16,6 @@ import (
 func (s *service) RegisterUser(ctx context.Context, userRegister model.UserRegister) (int64, error) {
 	createdAt := time.Now()
 
-	// todo:
-	panic("")
-
 	hash, err := s.hasher.Hash(userRegister.Password)
 	if err != nil {
 		logger.Warn(model.ErrInvalidToken.Error(), logger.String("error", err.Error()))

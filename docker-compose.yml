@@ -1,6 +1,18 @@
 version: '3.8'
 
 services:
+  prometheus:
+    container_name: chat-microservices-prometheus
+    image: prom/prometheus:v2.37.9
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-volume:/prometheus
+    networks:
+      - inter-service-network
+
   postgres:
     container_name: chat-microservices-postgres
     image: postgres:16.3-alpine3.20
@@ -50,6 +62,7 @@ services:
     ports:
       - "55051:55051"
       - "55052:55052"
+      - "2112:2112"
     environment:
       - "ENVIRONMENT=${ENVIRONMENT}"
 
@@ -96,6 +109,7 @@ services:
     ports:
       - "55054:55054"
       - "55055:55055"
+      - "2113:2112"
     environment:
       - "ENVIRONMENT=${ENVIRONMENT}"
 
@@ -117,6 +131,8 @@ volumes:
   redis-volume:
     driver: local
   mongo-volume:
+    driver: local
+  prometheus-volume:
     driver: local
 
 networks:

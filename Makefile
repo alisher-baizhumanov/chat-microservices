@@ -103,15 +103,23 @@ vendor-proto:
 up:
 	make down
 	docker-compose up --build --detach auth
-	docker compose up --build --detach chat-server
+	docker-compose up --build --detach chat-server
+	make up-prometheus
+
 
 up-auth:
 	make down
 	docker-compose up --build --detach auth
+	make up-prometheus
 
 up-chat:
 	make down
 	docker compose up --build --detach chat-server
+	make up-prometheus
+
+up-prometheus:
+	sleep 1
+	docker-compose up --build --detach prometheus
 
 down:
 	docker-compose down
