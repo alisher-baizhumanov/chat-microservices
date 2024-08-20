@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/logger"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 )

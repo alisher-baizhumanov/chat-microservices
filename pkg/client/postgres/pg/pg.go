@@ -2,7 +2,6 @@ package pg
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
@@ -113,8 +112,8 @@ func logQuery(q postgres.Query, args ...any) {
 		prettyQuery := prettier.Pretty(q.QueryRaw, prettier.PlaceholderDollar, args...)
 
 		logger.Debug("sql",
-			slog.String("query_name", q.Name),
-			slog.String("query", prettyQuery),
+			logger.String("query_name", q.Name),
+			logger.String("query", prettyQuery),
 		)
 	}
 }

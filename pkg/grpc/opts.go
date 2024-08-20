@@ -15,7 +15,7 @@ var (
 		grpc.Creds(insecure.NewCredentials()),
 		grpc.ChainUnaryInterceptor(
 			interceptor.Recover,
-			interceptor.Logger,
+			interceptor.Metrics,
 			interceptor.ValidateGRPC,
 		),
 	}

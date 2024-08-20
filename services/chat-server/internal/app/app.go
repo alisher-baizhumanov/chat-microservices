@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo/mg"
@@ -81,7 +80,7 @@ func (a *App) Run(ctx context.Context) (err error) {
 	a.grpcServer.Start()
 	defer a.grpcServer.Stop()
 	logger.Info("Starting gRPC Server",
-		slog.Int("port", a.cfg.GRPCServerPort),
+		logger.Int("port", a.cfg.GRPCServerPort),
 	)
 
 	a.httpServer.Start()
@@ -91,11 +90,11 @@ func (a *App) Run(ctx context.Context) (err error) {
 		}
 	}()
 	logger.Info("Starting HTTP Server",
-		slog.Int("port", a.cfg.HTTPServerPort),
+		logger.Int("port", a.cfg.HTTPServerPort),
 	)
 
 	stop := gracefulshutdown.WaitSignal()
-	logger.Info("Stop application", slog.String("signal", stop.String()))
+	logger.Info("Stop application", logger.String("signal", stop.String()))
 
 	return nil
 }

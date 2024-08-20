@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -64,7 +63,7 @@ func (m *mongoCollection) UpdateByID(ctx context.Context, queryName string, id s
 
 func logQuery(queryName string, args ...any) {
 	logger.Debug("mongo query",
-		slog.String("query_name", queryName),
-		slog.Any("args", args),
+		logger.String("query_name", queryName),
+		logger.Any("args", args),
 	)
 }
