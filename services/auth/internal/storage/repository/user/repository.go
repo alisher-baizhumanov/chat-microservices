@@ -17,7 +17,7 @@ const (
 	columnID             = "id"
 	columnName           = "nickname"
 	columnEmail          = "email"
-	columndRole          = "role"
+	columnRole           = "role"
 	columnCreatedAt      = "created_at"
 	columnUpdatedAt      = "updated_at"
 	columnHashedPassword = "hashed_password"

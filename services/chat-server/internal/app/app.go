@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo"
-	mg "github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo/mg"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo/mg"
 	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
 	http "github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
@@ -38,7 +38,7 @@ func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
 		return nil, err
 	}
 
-	httpServer, err := services.getHTTPserver(ctx)
+	httpServer, err := services.getHTTPServer(ctx)
 	if err != nil {
 		return nil, err
 	}

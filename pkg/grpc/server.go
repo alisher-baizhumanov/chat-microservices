@@ -30,7 +30,7 @@ func (s *Server) Stop() {
 
 // NewGRPCServer creates and returns a new Server instance listening on the specified port.
 // It also registers the user service and reflection service to the gRPC server.
-func NewGRPCServer(port int, serviceDesc *grpc.ServiceDesc, handlers any, opt ...grpc.ServerOption) (*Server, error) {
+func NewGRPCServer(port int, services []Service, opt ...grpc.ServerOption) (*Server, error) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		return nil, err
@@ -42,7 +42,10 @@ func NewGRPCServer(port int, serviceDesc *grpc.ServiceDesc, handlers any, opt ..
 
 	gRPCServer := grpc.NewServer(opt...)
 	reflection.Register(gRPCServer)
-	gRPCServer.RegisterService(serviceDesc, handlers)
+
+	for _, service := range services {
+		gRPCServer.RegisterService(service.ServiceDesc, service.Handler)
+	}
 
 	return &Server{
 		gRPCServer: gRPCServer,

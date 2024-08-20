@@ -57,7 +57,7 @@ func buildSQLQuery(options *data.UserUpdateOptions, id int64, updatedAt time.Tim
 	}
 
 	if options.Role != nil {
-		builder = builder.Set(columndRole, *options.Role)
+		builder = builder.Set(columnRole, *options.Role)
 	}
 
 	return builder.Where(sq.Eq{columnID: id}).ToSql()

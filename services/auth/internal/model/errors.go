@@ -26,4 +26,13 @@ var (
 
 	// ErrTimeConverting is used for general time converting error.
 	ErrTimeConverting = errors.New("time convert error")
+
+	// ErrPasswordHashing is used for general password hashing error
+	ErrPasswordHashing = errors.New("password hashing")
+
+	// ErrInvalidCredentials is used when an invalid password is provided.
+	ErrInvalidCredentials = errors.New("invalid credentials")
+
+	// ErrInvalidToken is used when an invalid token is provided.
+	ErrInvalidToken = errors.New("invalid token")
 )

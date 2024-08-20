@@ -17,6 +17,7 @@ func ErrorModelToProto(err error) error {
 	}
 
 	message := err.Error()
+
 	switch {
 	case errors.Is(err, model.ErrInvalidID):
 		return status.Error(codes.InvalidArgument, message)
@@ -26,10 +27,18 @@ func ErrorModelToProto(err error) error {
 		return status.Error(codes.InvalidArgument, "this email is already taken")
 	case errors.Is(err, model.ErrNonUniqueUsername):
 		return status.Error(codes.InvalidArgument, "this name is already taken")
+	case errors.Is(err, model.ErrInvalidCredentials):
+		return status.Error(codes.InvalidArgument, "invalid email or password")
+
+	case errors.Is(err, model.ErrInvalidToken):
+		return status.Error(codes.Unauthenticated, message)
+
 	case errors.Is(err, model.ErrNotFound):
 		return status.Error(codes.NotFound, "")
 
 	case errors.Is(err, model.ErrDatabase):
+		return status.Error(codes.Internal, message)
+	case errors.Is(err, model.ErrPasswordHashing):
 		return status.Error(codes.Internal, message)
 	default:
 		return status.Errorf(codes.Internal, "unknown error; message=\"%s\"", message)

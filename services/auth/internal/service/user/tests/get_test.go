@@ -113,7 +113,7 @@ func TestGetByID(t *testing.T) {
 
 			repositoryMock := test.userRepositoryMock(mc)
 			cacheMock := test.userCacheMock(mc)
-			service := userService.New(repositoryMock, cacheMock)
+			service := userService.New(repositoryMock, cacheMock, nil)
 
 			user, err := service.GetByID(ctx, test.id)
 

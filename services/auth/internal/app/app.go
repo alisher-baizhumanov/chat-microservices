@@ -25,7 +25,7 @@ type App struct {
 
 // NewApp creates and initializes a new App instance.
 func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
-	dbClient, err := pg.New(ctx, cfg.DSN)
+	dbClient, err := pg.New(ctx, cfg.DatabaseDSN)
 	if err != nil {
 		return nil, err
 	}

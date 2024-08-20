@@ -11,3 +11,8 @@ My contact: [telegram](https://t.me/cs_and_dev)
     ```bash
     make migration-create MIGRATION_NAME=<migration_name>
     ```
+3) setting `.env` file:
+    ```bash
+    cp .env.example .env
+    ```
+   Open `.env` file and set environments.

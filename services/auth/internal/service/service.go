@@ -13,3 +13,11 @@ type UserService interface {
 	UpdateUserFields(ctx context.Context, id int64, userUpdate model.UserUpdateOptions) error
 	DeleteByID(ctx context.Context, id int64) error
 }
+
+// AuthService defines the methods for managing authentication at the service layer.
+type AuthService interface {
+	Login(ctx context.Context, email, password string) (string, error)
+	GetRefreshToken(ctx context.Context, refreshToken string) (string, error)
+	GetAccessToken(ctx context.Context, refreshToken string) (string, error)
+	CheckAccess(ctx context.Context, path, accessToken string) error
+}

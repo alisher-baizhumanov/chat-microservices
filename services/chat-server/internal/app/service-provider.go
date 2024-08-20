@@ -100,12 +100,16 @@ func (s *serviceProvider) getGRPCHandlers() *grpcHandler.ServerHandlers {
 func (s *serviceProvider) getGRPCServer() (*grpc.Server, error) {
 	return grpc.NewGRPCServer(
 		s.getConfig().GRPCServerPort,
-		&desc.ChatServiceV1_ServiceDesc,
-		s.getGRPCHandlers(),
+		[]grpc.Service{
+			{
+				ServiceDesc: &desc.ChatServiceV1_ServiceDesc,
+				Handler:     s.getGRPCHandlers(),
+			},
+		},
 	)
 }
 
-func (s *serviceProvider) getHTTPserver(ctx context.Context) (*httpLibrary.Server, error) {
+func (s *serviceProvider) getHTTPServer(ctx context.Context) (*httpLibrary.Server, error) {
 	mux := runtime.NewServeMux()
 
 	if err := desc.RegisterChatServiceV1HandlerFromEndpoint(

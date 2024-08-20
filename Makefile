@@ -13,8 +13,8 @@ install:
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.14.0
 	GOBIN=$(LOCAL_BIN) go install github.com/gojuno/minimock/v3/cmd/minimock@v3.3.10
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.20.0
-	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.20.0
 	GOBIN=$(LOCAL_BIN) go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
+	make vendor-proto
 
 prepare:
 	make tidy
@@ -42,6 +42,7 @@ mock:
 generate:
 	make generate-user-api
 	make generate-chat-api
+	make generate-auth-api
 
 generate-user-api:
 	mkdir -p protos/generated/user-v1
@@ -71,6 +72,20 @@ generate-chat-api:
 		--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
 		api/proto/chat-v1/chat.proto
 
+generate-auth-api:
+	mkdir -p protos/generated/auth-v1
+	protoc --proto_path api/proto/auth-v1 \
+		--proto_path=vendor.protogen \
+    	--go_out=protos/generated/auth-v1 --go_opt=paths=source_relative \
+    	--plugin=protoc-gen-go=bin/protoc-gen-go \
+    	--go-grpc_out=protos/generated/auth-v1 --go-grpc_opt=paths=source_relative \
+    	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
+		--validate_out lang=go:protos/generated/auth-v1 --validate_opt=paths=source_relative \
+		--plugin=protoc-gen-validate=bin/protoc-gen-validate \
+		--grpc-gateway_out=protos/generated/auth-v1 --grpc-gateway_opt=paths=source_relative \
+		--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
+		api/proto/auth-v1/auth.proto
+
 vendor-proto:
 		@if [ ! -d vendor.protogen/google ]; then \
 			git clone https://github.com/googleapis/googleapis vendor.protogen/googleapis &&\
@@ -90,10 +105,10 @@ up:
 	make up-chat
 
 up-auth:
-	docker-compose up auth --build --detach
+	docker-compose up --build --detach auth
 
 up-chat:
-	docker compose up chat-server --build --detach
+	docker compose up --build --detach chat-server
 
 stop:
 	docker-compose stop

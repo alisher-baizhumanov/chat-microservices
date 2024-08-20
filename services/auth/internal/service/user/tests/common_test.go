@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+
 	"testing"
 	"time"
 
@@ -13,6 +14,8 @@ import (
 	cacheMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/cache/mocks"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository"
 	repositoryMocks "github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/storage/repository/mocks"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/utils/hasher"
+	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/utils/hasher/argon2id"
 )
 
 var (
@@ -39,11 +42,10 @@ var (
 	}
 
 	expUserDB = model.UserCreate{
-		Name:           name,
-		Email:          email,
-		Role:           role,
-		CreatedAt:      createdAt,
-		HashedPassword: password,
+		Name:      name,
+		Email:     email,
+		Role:      role,
+		CreatedAt: createdAt,
 	}
 
 	expUserInfo = model.User{
@@ -54,6 +56,8 @@ var (
 		CreatedAt: createdAt,
 		UpdatedAt: createdAt,
 	}
+
+	passwordHasher = argon2id.New(hasher.DefaultOptions)
 )
 
 func createUserRepositoryCreateMock(mc *minimock.Controller, t *testing.T) repository.UserRepository {
@@ -62,7 +66,10 @@ func createUserRepositoryCreateMock(mc *minimock.Controller, t *testing.T) repos
 		require.Equal(t, expUserDB.Name, actualUserDB.Name)
 		require.Equal(t, expUserDB.Email, actualUserDB.Email)
 		require.Equal(t, expUserDB.Role, actualUserDB.Role)
-		require.Equal(t, expUserDB.HashedPassword, actualUserDB.HashedPassword)
+
+		match, err := passwordHasher.Compare(password, actualUserDB.HashedPassword)
+		require.NoError(t, err)
+		require.True(t, match)
 	}).Return(id, nil)
 
 	return mock

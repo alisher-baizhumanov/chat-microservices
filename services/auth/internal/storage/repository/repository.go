@@ -13,4 +13,5 @@ type UserRepository interface {
 	GetUser(ctx context.Context, id int64) (model.User, error)
 	UpdateUser(ctx context.Context, id int64, userUpdate model.UserUpdateOptions, updatedAt time.Time) error
 	DeleteUser(ctx context.Context, id int64) error
+	GetCredentials(ctx context.Context, email string) (model.Credentials, error)
 }

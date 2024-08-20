@@ -27,3 +27,11 @@ type UserCreate struct {
 	HashedPassword []byte
 	CreatedAt      time.Time
 }
+
+// Credentials represents the data required to authenticate user.
+type Credentials struct {
+	ID             int64  `db:"id"`
+	Email          string `db:"email"`
+	HashedPassword []byte `db:"hashed_password"`
+	Role           int8   `db:"role"`
+}

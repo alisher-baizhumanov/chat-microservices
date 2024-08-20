@@ -57,6 +57,10 @@ services:
       - "DB_DSN=${POSTGRES_DB_DSN}"
       - "CACHE_DSN=${REDIS_DSN}"
       - "CACHE_TTL=${REDIS_TTL}"
+      - "ACCESS_TOKEN_TTL=${ACCESS_TOKEN_TTL}"
+      - "REFRESH_TOKEN_TTL=${REFRESH_TOKEN_TTL}"
+      - "ACCESS_SECRET_KEY=${ACCESS_SECRET_KEY}"
+      - "REFRESH_SECRET_KEY=${REFRESH_SECRET_KEY}"
     restart: unless-stopped
     networks:
       - inter-service-network

@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+package user_v1;
+
+option go_package = "github.com/alisher-baizhumanov/chat-microservices/protos/generated/auth-v1;auth_v1";
+
+service AuthServiceV1 {
+  rpc Login(LoginIn) returns (LoginOut) {
+    option (google.api.http) = {
+      post: "/auth/v1/login"
+    };
+  }
+  rpc GetRefreshToken(GetRefreshTokenIn) returns (GetRefreshTokenOut) {
+    option (google.api.http) = {
+      post: "/auth/v1/refresh-token"
+    };
+  }
+  rpc GetAccessToken(GetAccessTokenIn) returns (GetAccessTokenOut) {
+    option (google.api.http) = {
+      post: "/auth/v1/access-token"
+    };
+  }
+  rpc Check(CheckIn) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/auth/v1/access-token/check"
+    };
+  }
+}
+
+message LoginIn {
+  string email = 1 [(validate.rules).string.email = true];
+  string password = 2 [(validate.rules).string.min_len = 1];
+}
+
+message LoginOut {
+  string refresh_token = 1;
+}
+
+message GetRefreshTokenIn {
+  string refresh_token = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GetRefreshTokenOut {
+  string refresh_token = 1;
+}
+
+message GetAccessTokenIn {
+  string refresh_token = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GetAccessTokenOut {
+  string access_token = 1;
+}
+
+message CheckIn {
+  string endpoint_address = 1 [(validate.rules).string.min_len = 1];
+  string access_token = 2 [(validate.rules).string.min_len = 1];
+}
