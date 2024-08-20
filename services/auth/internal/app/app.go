@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/cache"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/cache/redis"
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
