@@ -5,17 +5,20 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/logger"
 )
 
-// Metrics is a gRPC interceptor that logs the details of each RPC call.
-func Metrics(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+// Logging is a gRPC interceptor that logs the details of each RPC call.
+func Logging(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 	start := time.Now()
 
 	resp, err := handler(ctx, req)
 
+	duration := time.Since(start)
 	var reqSize, respSize int
 	if protoReq, ok := req.(proto.Message); ok {
 		reqSize = proto.Size(protoReq)
@@ -25,12 +28,32 @@ func Metrics(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler g
 		respSize = proto.Size(protoResp)
 	}
 
-	logger.Info("rpc call",
-		logger.String("method", info.FullMethod),
-		logger.Duration("duration", time.Since(start)),
-		logger.Int("request_size", reqSize),
-		logger.Int("response_size", respSize),
-	)
+	code := errorCode(err).String()
+
+	logging(info.FullMethod, reqSize, respSize, duration, code)
 
 	return resp, err
+}
+
+func errorCode(err error) codes.Code {
+	if err == nil {
+		return codes.OK
+	}
+
+	errStatus, ok := status.FromError(err)
+	if !ok {
+		return codes.Unknown
+	}
+
+	return errStatus.Code()
+}
+
+func logging(method string, reqSize, respSize int, duration time.Duration, code string) {
+	logger.Info("rpc call",
+		logger.String("method", method),
+		logger.Duration("duration", duration),
+		logger.Int("request_size", reqSize),
+		logger.Int("response_size", respSize),
+		logger.String("code", code),
+	)
 }

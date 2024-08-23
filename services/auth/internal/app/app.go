@@ -11,14 +11,18 @@ import (
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc/http-gateway"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/logger"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/metrics"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/config"
 )
 
 // App represents the application with its services and gRPC server.
 type App struct {
-	cfg         *config.Config
-	grpcServer  *grpc.Server
-	httpServer  *http.Server
+	cfg *config.Config
+
+	grpcServer    *grpc.Server
+	httpServer    *http.Server
+	metricsServer *metrics.Server
+
 	dbClient    db.Client
 	cacheClient cache.Client
 }
@@ -54,51 +58,53 @@ func NewApp(ctx context.Context) (*App, error) {
 	}
 
 	return &App{
-		cfg:         cfg,
-		grpcServer:  grpcServer,
-		dbClient:    dbClient,
-		cacheClient: cacheClient,
-		httpServer:  httpServer,
+		cfg:           cfg,
+		grpcServer:    grpcServer,
+		dbClient:      dbClient,
+		cacheClient:   cacheClient,
+		httpServer:    httpServer,
+		metricsServer: metrics.NewMetricsServer(),
 	}, nil
 }
 
 // Run starts the gRPC server and waits for a termination signal to gracefully shut down the server.
-func (a *App) Run(ctx context.Context) (err error) {
+func (a *App) Run(ctx context.Context) error {
 	defer func() {
-		if errLogger := logger.Close(); errLogger != nil {
-			err = errLogger
-		}
+		_ = logger.Close()
 	}()
 
-	if err = a.dbClient.DB().Ping(ctx); err != nil {
+	if err := a.dbClient.DB().Ping(ctx); err != nil {
 		return err
 	}
 	defer a.dbClient.DB().Close()
 
-	if err = a.cacheClient.Ping(ctx); err != nil {
+	if err := a.cacheClient.Ping(ctx); err != nil {
 		return err
 	}
 	defer func() {
 		if errClose := a.cacheClient.Close(ctx); errClose != nil {
-			err = errClose
+			logger.Error("closing cache client", logger.String("error", errClose.Error()))
+		}
+	}()
+
+	a.metricsServer.Start()
+	defer func() {
+		if errClose := a.metricsServer.Stop(ctx); errClose != nil {
+			logger.Error("closing metrics server", logger.String("error", errClose.Error()))
 		}
 	}()
 
 	a.grpcServer.Start()
 	defer a.grpcServer.Stop()
-	logger.Info("Starting gRPC Server",
-		logger.Int("port", a.cfg.GRPCServerPort),
-	)
+	logger.Info("Starting gRPC Server", logger.Int("port", a.cfg.GRPCServerPort))
 
 	a.httpServer.Start()
 	defer func() {
 		if errClose := a.httpServer.Stop(ctx); errClose != nil {
-			err = errClose
+			logger.Error("closing http server", logger.String("error", errClose.Error()))
 		}
 	}()
-	logger.Info("Starting HTTP Server",
-		logger.Int("port", a.cfg.HTTPServerPort),
-	)
+	logger.Info("Starting HTTP Server", logger.Int("port", a.cfg.HTTPServerPort))
 
 	stop := gracefulshutdown.WaitSignal()
 	logger.Info("Stop application", logger.String("signal", stop.String()))

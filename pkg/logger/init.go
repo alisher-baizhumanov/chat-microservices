@@ -20,6 +20,13 @@ const (
 	Production = "prod"
 )
 
+// Constants for the logger writer settings.
+const (
+	maxSizeMegaBytes = 50
+	maxAgeDays       = 14
+	maxBackups       = 5
+)
+
 var (
 	// ErrUnknownEnvironment is returned when an unknown environment is provided.
 	ErrUnknownEnvironment = errors.New("unknown logger environment")
@@ -36,9 +43,9 @@ func Init(env LogEnvironment) error {
 	case Production:
 		writeCloser = &lumberjack.Logger{
 			Filename:   "logs/app.log",
-			MaxSize:    50, // megabytes
-			MaxAge:     14, // days
-			MaxBackups: 5,
+			MaxSize:    maxSizeMegaBytes,
+			MaxAge:     maxAgeDays,
+			MaxBackups: maxBackups,
 		}
 
 		globalLogger = slog.New(slog.NewJSONHandler(

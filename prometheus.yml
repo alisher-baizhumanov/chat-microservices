@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 3s # Как часто собирать метрики
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: [ "localhost:9090" ]
+
+  - job_name: "auth"
+    static_configs:
+      - targets: [ "chat-microservices-auth:2112" ]
+
+  - job_name: "chat-server"
+    static_configs:
+      - targets: [ "chat-microservices-chat-sever:2112" ]
