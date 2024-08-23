@@ -2,15 +2,15 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/cache"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/cache/redis"
 	db "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres"
-	pg "github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres/pg"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/postgres/pg"
 	gracefulshutdown "github.com/alisher-baizhumanov/chat-microservices/pkg/graceful-shutdown"
 	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc"
-	http "github.com/alisher-baizhumanov/chat-microservices/pkg/http-gateway"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/grpc/http-gateway"
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/logger"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/config"
 )
 
@@ -24,7 +24,16 @@ type App struct {
 }
 
 // NewApp creates and initializes a new App instance.
-func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
+func NewApp(ctx context.Context) (*App, error) {
+	cfg, err := config.Load()
+	if err != nil {
+		return nil, err
+	}
+
+	if err = logger.Init(logger.LogEnvironment(cfg.Env)); err != nil {
+		return nil, err
+	}
+
 	dbClient, err := pg.New(ctx, cfg.DatabaseDSN)
 	if err != nil {
 		return nil, err
@@ -55,6 +64,12 @@ func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
 
 // Run starts the gRPC server and waits for a termination signal to gracefully shut down the server.
 func (a *App) Run(ctx context.Context) (err error) {
+	defer func() {
+		if errLogger := logger.Close(); errLogger != nil {
+			err = errLogger
+		}
+	}()
+
 	if err = a.dbClient.DB().Ping(ctx); err != nil {
 		return err
 	}
@@ -71,8 +86,8 @@ func (a *App) Run(ctx context.Context) (err error) {
 
 	a.grpcServer.Start()
 	defer a.grpcServer.Stop()
-	slog.Info("Starting gRPC Server",
-		slog.Int("port", a.cfg.GRPCServerPort),
+	logger.Info("Starting gRPC Server",
+		logger.Int("port", a.cfg.GRPCServerPort),
 	)
 
 	a.httpServer.Start()
@@ -81,12 +96,12 @@ func (a *App) Run(ctx context.Context) (err error) {
 			err = errClose
 		}
 	}()
-	slog.Info("Starting HTTP Server",
-		slog.Int("port", a.cfg.HTTPServerPort),
+	logger.Info("Starting HTTP Server",
+		logger.Int("port", a.cfg.HTTPServerPort),
 	)
 
 	stop := gracefulshutdown.WaitSignal()
-	slog.Info("Stop application", slog.String("signal", stop.String()))
+	logger.Info("Stop application", logger.String("signal", stop.String()))
 
 	return nil
 }

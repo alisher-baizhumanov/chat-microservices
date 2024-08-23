@@ -22,7 +22,9 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.21.0
+	github.com/lmittmann/tint v1.0.5
 	google.golang.org/genproto/googleapis/api v0.0.0-20240723171418-e6d459c13d2a
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (

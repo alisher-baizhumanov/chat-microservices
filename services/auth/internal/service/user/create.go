@@ -2,10 +2,11 @@ package user
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"log/slog"
 	"time"
 
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/logger"
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"
 )
 
@@ -17,6 +18,7 @@ func (s *service) RegisterUser(ctx context.Context, userRegister model.UserRegis
 
 	hash, err := s.hasher.Hash(userRegister.Password)
 	if err != nil {
+		logger.Warn(model.ErrInvalidToken.Error(), logger.String("error", err.Error()))
 		return 0, fmt.Errorf("%w, message: %w", model.ErrPasswordHashing, err)
 	}
 
@@ -30,6 +32,15 @@ func (s *service) RegisterUser(ctx context.Context, userRegister model.UserRegis
 
 	id, err := s.userRepository.CreateUser(ctx, userCreate)
 	if err != nil {
+		switch {
+		case errors.Is(err, model.ErrNonUniqueEmail):
+			logger.Info("email is not unique", logger.String("email", userCreate.Email))
+		case errors.Is(err, model.ErrNonUniqueUsername):
+			logger.Info("username is not unique", logger.String("username", userCreate.Name))
+		default:
+			logger.Warn("database error", logger.String("error", err.Error()))
+		}
+
 		return 0, err
 	}
 
@@ -43,11 +54,12 @@ func (s *service) RegisterUser(ctx context.Context, userRegister model.UserRegis
 	}
 
 	if err = s.userCache.Set(ctx, user); err != nil {
-		slog.ErrorContext(ctx, "not created user in cache",
-			slog.String("error", err.Error()),
-			slog.Int64("id", id),
+		logger.Warn("Register user: not created user in cache",
+			logger.String("error", err.Error()),
+			logger.Int64("id", id),
 		)
 	}
 
+	logger.Info("user registered", logger.Int64("id", id))
 	return id, nil
 }

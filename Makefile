@@ -101,19 +101,22 @@ vendor-proto:
 		fi
 
 up:
-	make up-auth
-	make up-chat
+	make down
+	docker-compose up --build --detach auth
+	docker compose up --build --detach chat-server
 
 up-auth:
+	make down
 	docker-compose up --build --detach auth
 
 up-chat:
+	make down
 	docker compose up --build --detach chat-server
 
-stop:
-	docker-compose stop
-
 down:
+	docker-compose down
+
+down-all:
 	docker-compose down --remove-orphans --volumes
 
 migration-status:

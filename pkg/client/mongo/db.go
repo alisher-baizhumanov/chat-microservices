@@ -2,6 +2,8 @@ package mongo
 
 import (
 	"context"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // Client - a client for interacting with the database.
@@ -15,5 +17,5 @@ type Client interface {
 type Collection interface {
 	InsertOne(ctx context.Context, queryName string, document any) (string, error)
 	InsertMany(ctx context.Context, queryName string, documents []any) error
-	UpdateByID(ctx context.Context, queryName string, id string, update map[string]any) error
+	UpdateByID(ctx context.Context, queryName string, id string, update bson.M) error
 }

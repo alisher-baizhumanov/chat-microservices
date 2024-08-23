@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/app"
-	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/config"
 )
 
 func main() {
@@ -17,12 +16,7 @@ func main() {
 func run() error {
 	ctx := context.Background()
 
-	cfg, err := config.Load()
-	if err != nil {
-		return err
-	}
-
-	application, err := app.NewApp(ctx, cfg)
+	application, err := app.NewApp(ctx)
 	if err != nil {
 		return err
 	}

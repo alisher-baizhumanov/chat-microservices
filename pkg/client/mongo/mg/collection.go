@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	mongoLibrary "go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/logger"
 )
 
 var (
@@ -22,7 +23,7 @@ type mongoCollection struct {
 
 // InsertOne inserts a single document into the collection.
 func (m *mongoCollection) InsertOne(ctx context.Context, queryName string, document any) (string, error) {
-	logQuery(ctx, queryName, document)
+	logQuery(queryName, document)
 
 	id, err := m.collection.InsertOne(ctx, document)
 	if err != nil {
@@ -39,34 +40,30 @@ func (m *mongoCollection) InsertOne(ctx context.Context, queryName string, docum
 
 // InsertMany inserts multiple documents into the collection.
 func (m *mongoCollection) InsertMany(ctx context.Context, queryName string, documents []any) error {
-	logQuery(ctx, queryName, documents)
+	logQuery(queryName, documents)
 
 	_, err := m.collection.InsertMany(ctx, documents)
 	return err
 }
 
 // UpdateByID updates a document in the collection by its ID.
-func (m *mongoCollection) UpdateByID(ctx context.Context, queryName string, id string, update map[string]any) error {
+func (m *mongoCollection) UpdateByID(ctx context.Context, queryName string, id string, update bson.M) error {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrInvalidID, err)
 	}
 
-	logQuery(ctx, queryName, id, update)
+	logQuery(queryName, id, update)
 
 	filter := bson.M{"_id": objectID}
-	mongoUpdate := toBsonM(update)
 
-	_, err = m.collection.UpdateOne(ctx, filter, mongoUpdate)
+	_, err = m.collection.UpdateOne(ctx, filter, update)
 	return err
 }
 
-func logQuery(ctx context.Context, queryName string, args ...any) {
-	if slog.Default().Enabled(ctx, slog.LevelDebug) {
-		slog.DebugContext(
-			ctx,
-			queryName,
-			slog.Any("args", args),
-		)
-	}
+func logQuery(queryName string, args ...any) {
+	logger.Debug("mongo query",
+		logger.String("query_name", queryName),
+		logger.Any("args", args),
+	)
 }

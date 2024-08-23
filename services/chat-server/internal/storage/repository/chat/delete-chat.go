@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	mg "github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo/mg"
+	"go.mongodb.org/mongo-driver/bson"
+
+	"github.com/alisher-baizhumanov/chat-microservices/pkg/client/mongo/mg"
 	"github.com/alisher-baizhumanov/chat-microservices/services/chat-server/internal/model"
 )
 
@@ -14,8 +16,8 @@ import (
 // This function updates the chat document identified by the given ID with the current time,
 // marking it as deleted. The actual document is not removed from the database.
 func (r *repository) DeleteChatByID(ctx context.Context, id string) error {
-	update := map[string]any{
-		"$set": map[string]any{
+	update := bson.M{
+		"$set": bson.M{
 			"deletedAt": time.Now(),
 		},
 	}

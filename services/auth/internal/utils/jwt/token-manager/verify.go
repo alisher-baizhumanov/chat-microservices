@@ -2,6 +2,7 @@ package token_manager
 
 import (
 	"fmt"
+
 	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/alisher-baizhumanov/chat-microservices/services/auth/internal/model"

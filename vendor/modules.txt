@@ -77,6 +77,9 @@ github.com/lann/builder
 # github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0
 ## explicit
 github.com/lann/ps
+# github.com/lmittmann/tint v1.0.5
+## explicit; go 1.21
+github.com/lmittmann/tint
 # github.com/montanaflynn/stats v0.7.1
 ## explicit; go 1.13
 github.com/montanaflynn/stats
@@ -305,6 +308,9 @@ google.golang.org/protobuf/types/known/fieldmaskpb
 google.golang.org/protobuf/types/known/structpb
 google.golang.org/protobuf/types/known/timestamppb
 google.golang.org/protobuf/types/known/wrapperspb
+# gopkg.in/natefinch/lumberjack.v2 v2.2.1
+## explicit; go 1.13
+gopkg.in/natefinch/lumberjack.v2
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
